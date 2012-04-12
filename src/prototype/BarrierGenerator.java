@@ -5,7 +5,8 @@
 package prototype;
 
 import java.awt.Rectangle;
-
+import java.util.Random;
+import java.util.*;
 /**
  *
  * @author xtian8741
@@ -20,15 +21,37 @@ public class BarrierGenerator {
      * @param dimension The side-length, in pixels, of the image.
      * @return A 2D array with pixel color values.
      */
-    public static int[][] generateMap(int polygons, int dimension) {
-        int[][] map = new int[dimension][dimension];
+    public static int[] generateMap(int polygons, int dimension) {
+        int[] map = new int[dimension*dimension];
         Rectangle[] shapes = new Rectangle[polygons];
-        
+        double r = Math.random();
+        int[] fin = new int[dimension * dimension];
+        Random rnd = new Random();
+        Rectangle g;
         int index = 0;
+        boolean notCon;
+        int w, l, x, y;
+        int rndtrack;
         //Make some random Rectangles.
-        while (index < shapes.length) {
+        while (index <= shapes.length) {
             //Code
-            
+            w = rnd.nextInt(dimension);
+            l = rnd.nextInt(dimension);
+            x = rnd.nextInt(dimension);
+            y = rnd.nextInt(dimension);
+            g = new Rectangle(w, l, x, y);
+            for(int i = index; i >= 0; i--){
+                if(!shapes[i].contains(x, y)){
+                    //shapes[index].add(g);
+                    notCon = true;
+                }else{
+                    notCon = false;
+                } 
+            }
+            if(notCon = true){
+                shapes[index].add(g);
+            }
+            index++;
             /*
              * 1. Generate rectangle WxH @ (x,y)
              * 2. Check previously instantiated rectangles, check if this rectangle 
@@ -39,9 +62,17 @@ public class BarrierGenerator {
         }
         
         for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[i].length; j++) {
+            for (int j = 0; j < dimension; j++) {//map[i].length
                 //Set stuff by pixels. Hint: check contains(int x, int y) method defined in Rectangle
+                int n = 0;
+                while(n != shapes.length){
                 
+                if(shapes[n].contains(i, j)){
+                    map[i*j] = 0x00000;
+                }else{
+                    n++;
+                }
+                }
                 /*
                  * 1. N = 0
                  * 2. Check if shapes[N] contains (i,j). If yes, 3. If no, N++, repeat 2 until N = shapes.length.
@@ -50,6 +81,7 @@ public class BarrierGenerator {
                  */
             }
         }
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
+        return map;
     }
 }
