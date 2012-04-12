@@ -29,7 +29,7 @@ public class left4k extends Applet implements Runnable
         Graphics ogr = image.getGraphics();
 
         Random random = new Random();
-        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData(); //pixel color values as hex constants
         int[] sprites = new int[18 * 4 * 16 * 12 * 12];
         int pix = 0;
         for (int i = 0; i < 18; i++)
@@ -39,10 +39,10 @@ public class left4k extends Applet implements Runnable
 
             if (i > 0)
             {
-                skin = 0xa0ff90;
-                clothes = (random.nextInt(0x1000000) & 0x7f7f7f);
+                skin = 0xa0ff90;    //color of skin
+                clothes = (random.nextInt(0x1000000) & 0x7f7f7f);   //color of clothes
             }
-            for (int t = 0; t < 4; t++)
+            for (int t = 0; t < 4; t++) //building the player sprite?
             {
                 for (int d = 0; d < 16; d++)
                 {
@@ -125,18 +125,18 @@ public class left4k extends Applet implements Runnable
             {
                 int tick = 0;
                 level++;
-                int[] map = new int[1024 * 1024];
+                int[] map = new int[1024 * 1024];   //the whole level map
                 random = new Random(4329+level);
 
                 int[] monsterData = new int[320 * 16];
                 {
                     int i = 0;
-                    for (int y = 0; y < 1024; y++)
-                        for (int x = 0; x < 1024; x++)
+                    for (int y = 0; y < 1024; y++)  //loop through by pixel row
+                        for (int x = 0; x < 1024; x++)  //loop through by pixel column
                         {
                             int br = random.nextInt(32) + 112;
                             map[i] = (br / 3) << 16 | (br) << 8;
-                            if (x < 4 || y < 4 || x >= 1020 || y >= 1020)
+                            if (x < 4 || y < 4 || x >= 1020 || y >= 1020)   //borders
                             {
                                 map[i] = 0xFFFEFE;
                             }
