@@ -6,7 +6,6 @@ package prototype;
 
 import java.awt.Rectangle;
 import java.util.Random;
-import java.util.*;
 /**
  *
  * @author xtian8741
@@ -24,64 +23,42 @@ public class BarrierGenerator {
     public static int[] generateMap(int polygons, int dimension) {
         int[] map = new int[dimension*dimension];
         Rectangle[] shapes = new Rectangle[polygons];
-        double r = Math.random();
-        int[] fin = new int[dimension * dimension];
         Random rnd = new Random();
-        Rectangle g;
         int index = 0;
-        boolean notCon;
-        int w, l, x, y;
-        int rndtrack;
         //Make some random Rectangles.
-        while (index <= shapes.length) {
+        while (index < shapes.length) {
             //Code
-            w = rnd.nextInt(dimension);
-            l = rnd.nextInt(dimension);
-            x = rnd.nextInt(dimension);
-            y = rnd.nextInt(dimension);
-            g = new Rectangle(w, l, x, y);
-            for(int i = index; i >= 0; i--){
-                if(!shapes[i].contains(x, y)){
-                    //shapes[index].add(g);
-                    notCon = true;
-                }else{
-                    notCon = false;
-                } 
+            int w = rnd.nextInt(dimension / 5);
+            int l = rnd.nextInt(dimension / 5);
+            int x = rnd.nextInt(dimension);
+            int y = rnd.nextInt(dimension);
+            Rectangle g = new Rectangle(w, l, x, y);
+            boolean f = false;
+            for(int i = index - 1; i >= 0; i--){
+                if (shapes[i].intersects(g)) {
+                    f = true;
+                    break;
+                }
             }
-            if(notCon = true){
-                shapes[index].add(g);
+            
+            if (!f) {
+                shapes[index] = g;
+                index++;
             }
-            index++;
-            /*
-             * 1. Generate rectangle WxH @ (x,y)
-             * 2. Check previously instantiated rectangles, check if this rectangle 
-             * intersects any others. If yes, go back to 1.
-             * 3. Add this rectangle to the array at index #index
-             * 4. index++
-             */
         }
         
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < dimension; j++) {//map[i].length
-                //Set stuff by pixels. Hint: check contains(int x, int y) method defined in Rectangle
-                int n = 0;
-                while(n != shapes.length){
-                
-                if(shapes[n].contains(i, j)){
-                    map[i*j] = 0x00000;
-                }else{
-                    n++;
+        int k = 0;
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                for (int n = 0; n < shapes.length; n++) {
+                    if (shapes[n].contains(i, j)) {
+                        map[k] = 0xFF0000;
+                        break;
+                    }
                 }
-                }
-                /*
-                 * 1. N = 0
-                 * 2. Check if shapes[N] contains (i,j). If yes, 3. If no, N++, repeat 2 until N = shapes.length.
-                 * 3. Set map[i][j] to hexcode for black color.
-                 * 4. Terminate, move on.
-                 */
+                k++;
             }
         }
-        //throw new UnsupportedOperationException();
         return map;
     }
 }
