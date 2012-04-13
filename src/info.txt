@@ -1,0 +1,4 @@
+Human skin color: FF9993
+Human clothes color: 878787
+
+CPU skin color: 00FF90

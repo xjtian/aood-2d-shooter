@@ -12,32 +12,13 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import org.junit.*;
+import org.junit.Test;
 
 /**
  *
  * @author xtian8741
  */
 public class BarrierGeneratorTest {
-    
-    public BarrierGeneratorTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test of drawShapes method, of class BarrierGenerator.
