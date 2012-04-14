@@ -8,7 +8,7 @@ import java.awt.Rectangle;
 import java.util.Random;
 /**
  *
- * @author xtian8741
+ * @author Tyler Bailey
  */
 public class BarrierGenerator {
     
