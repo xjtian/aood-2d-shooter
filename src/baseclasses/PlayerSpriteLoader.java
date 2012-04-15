@@ -6,7 +6,6 @@ package baseclasses;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
-import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -22,7 +21,7 @@ import javax.imageio.ImageIO;
  * @author Jacky Tian
  */
 public class PlayerSpriteLoader {
-    private static HashMap<Integer, Image> sprites = new HashMap<Integer, Image>();
+    private static HashMap<Integer, BufferedImage> sprites = new HashMap<Integer, BufferedImage>();
     private static final int WIDTH = 40;
     private static final int HEIGHT = 40;
     
@@ -40,8 +39,8 @@ public class PlayerSpriteLoader {
             }
             
             GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-            Image image = gc.createCompatibleImage(40, 40, Transparency.BITMASK);
-            image.getGraphics().drawImage(loaded, 0, 0, null);
+            BufferedImage image = gc.createCompatibleImage(40, 40, Transparency.BITMASK);
+            image.createGraphics().drawImage(loaded, 0, 0, null);
             
             sprites.put(direction, image);
             direction += 15;
@@ -54,7 +53,7 @@ public class PlayerSpriteLoader {
      * @param direction The degree measure of turn, in 15-degree increments up to 345.
      * @return The corresponding sprite, if the degree value is valid.
      */
-    public static Image getSprite(int direction) {
+    public static BufferedImage getSprite(int direction) {
         return sprites.get(direction);
     }
 }

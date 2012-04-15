@@ -43,10 +43,8 @@ public class BarrierFactory {
     /**
      * Construct a left-facing L block (_|). Both legs are 1 grid-square thick.
      * 
-     * @param gx x-coordinate of upper-left corner of the rectangle that would 
-     * contain the block in grid.
-     * @param gy y-coordinate of upper-left corner of the rectangle that would 
-     * contain the block in grid. 
+     * @param gx x-coordinate of upper-left corner of bounding rectangle.
+     * @param gy y-coordinate of upper-left corner of bounding rectangle. 
      * @param gw width of rectangle in grid.
      * @param gh height of rectangle in grid.
      * @return A <code>Polygon</code> object that is the specified L-block.
@@ -61,10 +59,8 @@ public class BarrierFactory {
     /**
      * Construct a right-facing L block (L). Both legs are 1 grid-square thick.
      * 
-     * @param gx x-coordinate of upper-left corner of the rectangle that would 
-     * contain the block in grid.
-     * @param gy y-coordinate of upper-left corner of the rectangle that would 
-     * contain the block in grid. 
+     * @param gx x-coordinate of upper-left corner of bounding rectangle.
+     * @param gy y-coordinate of upper-left corner of bounding rectangle. 
      * @param gw width of rectangle in grid.
      * @param gh height of rectangle in grid.
      * @return A <code>Polygon</code> object that is the specified L-block.
@@ -74,5 +70,33 @@ public class BarrierFactory {
             (gx+gw)*gridSize, (gx+gw)*gridSize, gx*gridSize}, 
                 new int[]{gy*gridSize, gy*gridSize, (gy+gh-1)*gridSize, 
                     (gy+gh-1)*gridSize, (gy+gh)*gridSize, (gy+gh)*gridSize}, 6);
+    }
+    
+    /**
+     * Construct a right-facing upside-down L (|-). Both legs are 1 grid-square thick.
+     * 
+     * @param gx x-coordinate of upper-left corner of bounding rectangle.
+     * @param gy y-coordinate of upper-left corner of bounding rectangle. 
+     * @param gw width of rectangle in grid.
+     * @param gh height of rectangle in grid.
+     * @return A <code>Polygon</code> object that is the specified L-block.
+     */
+    public static Polygon generateRightFlippedL(int gx, int gy, int gw, int gh) {
+        //@TODO: complete method
+        throw new UnsupportedOperationException();
+    }
+    
+    /**
+     * Construct a left-facing upside-down L (-|). Both legs are 1 grid-square thick.
+     * 
+     * @param gx x-coordinate of upper-left corner of bounding rectangle.
+     * @param gy y-coordinate of upper-left corner of bounding rectangle. 
+     * @param gw width of rectangle in grid.
+     * @param gh height of rectangle in grid.
+     * @return A <code>Polygon</code> object that is the specified L-block.
+     */
+    public static Polygon generateLeftFlippedL(int gx, int gy, int gw, int gh) {
+        //@TODO: complete method
+        throw new UnsupportedOperationException();
     }
 }

@@ -2,3 +2,14 @@ Human skin color: FF9993
 Human clothes color: 878787
 
 CPU skin color: 00FF90
+FF0000 dot
+
+CPU sprite size: exactly 20x20 square
+Human sprite:
+	Bounded in a 40x40 square
+	Middle body is 16x16
+	Arms are 8x8
+	At 0 degree position:
+		12px space between top/bottom of body and bound
+		4px space between left/right of body and bound
+	Center of the body is in the exact center of bounding rectangle
