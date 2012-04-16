@@ -6,6 +6,7 @@ package prototype;
 
 import baseclasses.BarrierFactory;
 import baseclasses.Bullet;
+import baseclasses.ComputerSpriteLoader;
 import baseclasses.PlayerSpriteLoader;
 import java.applet.Applet;
 import java.awt.*;
@@ -15,15 +16,18 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
- * Move and shoot bullets applet.
- * 
- * @author Jacky Tian
+ *
+ * @author xtian8741
  */
-public class MoveAndShoot extends Applet implements Runnable {
+public class AITurn extends Applet implements Runnable {
 
     private boolean[] commands = new boolean[32767];
     private int x = 200;
     private int y = 200;
+    
+    //@TODO: cpu sprite turn directions in photoshop
+    private int cx = 300;
+    private int cy = 300;
     
     private int mx = 200;
     private int my = 100;
@@ -45,6 +49,7 @@ public class MoveAndShoot extends Applet implements Runnable {
     
     {
         PlayerSpriteLoader.loadAllImages();
+        ComputerSpriteLoader.loadAllImages();
         bgimage = new BufferedImage(400, 400, BufferedImage.BITMASK);
         
         buffer = new BufferedImage(400, 400, BufferedImage.BITMASK);
@@ -169,15 +174,34 @@ public class MoveAndShoot extends Applet implements Runnable {
                 
                 int bx = userbullets.get(i).getX();
                 int by = userbullets.get(i).getY();
-                if (bx < 0 || bx > 400 || by < 0 || by > 400)
+                if (bx < 0 || bx > 400 || by < 0 || by > 400) {
                     userbullets.remove(i);
+                    continue inbullets;
+                }
+                
+                if (userbullets.get(i).getBounds().intersects(new Rectangle(cx, cy, 20, 20))) {
+                    userbullets.remove(i);
+                    //User hit the computer
+                }
             }
+            
+            double cradians = Math.atan2((double) (cy - y), (double) (cx - x));
+            int cdir = (int)Math.toDegrees(cradians);
+            
+            cdir = (cdir%15 > 7) ? cdir+(15 - cdir%15):cdir - cdir%15;
+            cdir -=90;
+            
+            if (cdir < 0)
+                cdir = 360 + cdir;
+            if (cdir == 360)
+                cdir = 0;
             
             ogr = buffer.createGraphics();
             ogr.setColor(Color.white);
             ogr.fillRect(0, 0, 400, 400);
             ogr.drawImage(bgimage, null, 0, 0);
             ogr.drawImage(PlayerSpriteLoader.getSprite(dir), x, y, null);
+            ogr.drawImage(ComputerSpriteLoader.getSprite(cdir), cx, cy, null);
             for (Bullet b : userbullets)
                 b.draw(ogr);
             ogr.dispose();
