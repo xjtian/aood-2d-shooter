@@ -79,7 +79,7 @@ public class MoveAndShoot extends Applet implements Runnable {
     
     @Override
     public void start() {
-        enableEvents(AWTEvent.KEY_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK);
+        enableEvents(AWTEvent.KEY_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK);
         setSize(400, 400);
         gameLoop = new Thread(this);
         gameLoop.start();
@@ -87,7 +87,12 @@ public class MoveAndShoot extends Applet implements Runnable {
 
     @Override
     public void run() {
+        long lastTime = System.currentTimeMillis();
         while (stopFlag) {
+            long interval = System.currentTimeMillis() - lastTime;
+            if (interval > 100) 
+                lastTime = System.currentTimeMillis();
+            
             double radians = Math.atan2((double) (y + 20 - my), (double) (x + 20 -mx));
             int dir = (int)Math.toDegrees(radians);
             
@@ -144,13 +149,37 @@ public class MoveAndShoot extends Applet implements Runnable {
                 }
             }
             
-            //@TODO: implement shooting, then collision detection for every bullet
+            if (interval > 100) {
+                if (commands[MouseEvent.BUTTON1])
+                    userbullets.add(new Bullet(x+15, y+15, Math.toRadians((double) (90-dir)), true));
+            }
+            
+            if (interval > 10) {
+                for (Bullet b : userbullets)
+                    b.move();
+            }
+            
+            inbullets: for (int i = userbullets.size() -1; i >= 0; i--) {
+                for (int j = 0; j < barriers.length; j++) {
+                    if (barriers[j].intersects(userbullets.get(i).getBounds())) {
+                        userbullets.remove(i);
+                        break inbullets;
+                    }
+                }
+                
+                int bx = userbullets.get(i).getX();
+                int by = userbullets.get(i).getY();
+                if (bx < 0 || bx > 400 || by < 0 || by > 400)
+                    userbullets.remove(i);
+            }
             
             ogr = buffer.createGraphics();
             ogr.setColor(Color.white);
             ogr.fillRect(0, 0, 400, 400);
             ogr.drawImage(bgimage, null, 0, 0);
             ogr.drawImage(PlayerSpriteLoader.getSprite(dir), x, y, null);
+            for (Bullet b : userbullets)
+                b.draw(ogr);
             ogr.dispose();
             
             this.getGraphics().drawImage(buffer, 0, 0, null);
@@ -180,6 +209,10 @@ public class MoveAndShoot extends Applet implements Runnable {
             case KeyEvent.KEY_RELEASED:
                 commands[((KeyEvent) e).getKeyCode()] = down;
                 break;
+            case MouseEvent.MOUSE_PRESSED:
+                down = true;
+            case MouseEvent.MOUSE_RELEASED:
+                commands[((MouseEvent) e).getButton()] = down;
             case MouseEvent.MOUSE_MOVED:
             case MouseEvent.MOUSE_DRAGGED:
                 mx = ((MouseEvent) e).getX();

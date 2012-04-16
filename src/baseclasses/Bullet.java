@@ -5,6 +5,8 @@
 package baseclasses;
 
 import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -89,5 +91,18 @@ public class Bullet {
      */
     public int getY() {
         return y;
+    }
+    
+    /**
+     * Get point
+     * 
+     * @return Upper-left of bounding square.
+     */
+    public Point getPoint() {
+        return new Point(x, y);
+    }
+    
+    public Rectangle getBounds() {
+        return new Rectangle(x, y, 10, 10);
     }
 }

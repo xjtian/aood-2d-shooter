@@ -38,8 +38,8 @@ public class PlayerSpriteLoader {
                 loaded = new BufferedImage(40, 40, BufferedImage.BITMASK);
             }
             
-            //Appears that hardware-accelerated image is SLOWER than non-accelerated image on T400.
-            //@TODO: Check framerate comparison of hardware-acceleration vs cpu on other devices.
+            //Appears that hardware-accelerated image is significantly SLOWER than non-accelerated image on T400.
+            //Framerate comparison on school computers reveals regular images are slightly faster
             GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
             BufferedImage image = gc.createCompatibleImage(40, 40, Transparency.BITMASK);
             image.createGraphics().drawImage(loaded, 0, 0, null);
