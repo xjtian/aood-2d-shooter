@@ -22,8 +22,8 @@ import javax.imageio.ImageIO;
  */
 public class PlayerSpriteLoader {
     private static HashMap<Integer, BufferedImage> sprites = new HashMap<Integer, BufferedImage>();
-    private static final int WIDTH = 40;
-    private static final int HEIGHT = 40;
+    public static final int WIDTH = 40;
+    public static final int HEIGHT = 40;
     
     /**
      * Load all 24 sprites as hardware-accelerated images.
@@ -35,14 +35,17 @@ public class PlayerSpriteLoader {
             try {
                 loaded = ImageIO.read(PlayerSpriteLoader.class.getClass().getResource("/resources/playersprites/ps" + Integer.toString(direction) + ".png"));
             } catch (IOException ex) {
-                loaded = new BufferedImage(40, 40, BufferedImage.TYPE_INT_RGB);
+                loaded = new BufferedImage(40, 40, BufferedImage.BITMASK);
             }
             
+            //Appears that hardware-accelerated image is SLOWER than non-accelerated image on T400.
+            //@TODO: Check framerate comparison of hardware-acceleration vs cpu on other devices.
             GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
             BufferedImage image = gc.createCompatibleImage(40, 40, Transparency.BITMASK);
             image.createGraphics().drawImage(loaded, 0, 0, null);
             
-            sprites.put(direction, image);
+            //sprites.put(direction, image);
+            sprites.put(direction, loaded);
             direction += 15;
         }
     }

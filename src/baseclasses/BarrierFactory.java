@@ -82,8 +82,10 @@ public class BarrierFactory {
      * @return A <code>Polygon</code> object that is the specified L-block.
      */
     public static Polygon generateRightFlippedL(int gx, int gy, int gw, int gh) {
-        //@TODO: complete method
-        throw new UnsupportedOperationException();
+        return new Polygon(new int[]{gx*gridSize, (gx+gw)*gridSize, (gx+gw)*gridSize, 
+            (gx+1)*gridSize, (gx+1)*gridSize, gx*gridSize}, 
+                new int[]{gy*gridSize, gy*gridSize, (gy+1)*gridSize, (
+                gy+1)*gridSize, (gy+gh)*gridSize, (gy+gh)*gridSize}, 6);
     }
     
     /**
@@ -96,7 +98,9 @@ public class BarrierFactory {
      * @return A <code>Polygon</code> object that is the specified L-block.
      */
     public static Polygon generateLeftFlippedL(int gx, int gy, int gw, int gh) {
-        //@TODO: complete method
-        throw new UnsupportedOperationException();
+        return new Polygon(new int[]{gx*gridSize, (gx+gw)*gridSize, (gx+gw)*gridSize, 
+            (gx+gw-1)*gridSize, (gx+gw-1)*gridSize, gx*gridSize}, 
+                new int[]{gy*gridSize, gy*gridSize, (gy+gh)*gridSize, 
+                    (gy+gh)*gridSize, (gy+1)*gridSize, (gy+1)*gridSize}, 6);
     }
 }

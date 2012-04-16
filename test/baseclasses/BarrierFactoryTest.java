@@ -95,4 +95,50 @@ public class BarrierFactoryTest {
         while(frame.isVisible()) {}
         assert true;
     }
+    
+    /**
+     * Test of generateRightFlippedL, of class BarrierFactory.
+     */
+    @Test
+    public void testGenerateRightFlippedL() {
+        System.out.println("Right flipped L");
+        final Polygon p = BarrierFactory.generateRightFlippedL(2, 2, 4, 2);
+        
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        JComponent c = new JComponent() {
+            public void paintComponent(Graphics g) {
+                g.fillPolygon(p);
+            }
+        };
+        frame.add(c, BorderLayout.CENTER);
+        frame.setSize(200, 200);
+        frame.setVisible(true);
+        while(frame.isVisible()) {}
+        assert true;
+    }
+    
+    /**
+     * Test of generateLeftFlippedL, of class BarrierFactory.
+     */
+    @Test
+    public void testGenerateLeftFlippedL() {
+        System.out.println("Left flipped L");
+        final Polygon p = BarrierFactory.generateLeftFlippedL(2, 2, 4, 2);
+        
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        JComponent c = new JComponent() {
+            public void paintComponent(Graphics g) {
+                g.fillPolygon(p);
+            }
+        };
+        frame.add(c, BorderLayout.CENTER);
+        frame.setSize(200, 200);
+        frame.setVisible(true);
+        while(frame.isVisible()) {}
+        assert true;
+    }
 }

@@ -5,19 +5,21 @@
 package prototype;
 
 import baseclasses.BarrierFactory;
+import baseclasses.Bullet;
 import baseclasses.PlayerSpriteLoader;
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
- * Applet demonstrating the use of barriers in a map.
+ * Move and shoot bullets applet.
  * 
- * @author jacky
+ * @author Jacky Tian
  */
-public class SpriteMoveBarriers extends Applet implements Runnable {
+public class MoveAndShoot extends Applet implements Runnable {
 
     private boolean[] commands = new boolean[32767];
     private int x = 200;
@@ -36,15 +38,16 @@ public class SpriteMoveBarriers extends Applet implements Runnable {
     private boolean[][] map;
     private Polygon[] barriers;
     
+    private ArrayList<Bullet> userbullets;
+    
     private BufferedImage buffer;
     private Graphics2D ogr;
     
     {
         PlayerSpriteLoader.loadAllImages();
-        GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-        bgimage = gc.createCompatibleImage(400, 400, Transparency.BITMASK);
+        bgimage = new BufferedImage(400, 400, BufferedImage.BITMASK);
         
-        buffer = gc.createCompatibleImage(400, 400, Transparency.BITMASK);
+        buffer = new BufferedImage(400, 400, BufferedImage.BITMASK);
         
         barriers = new Polygon[4];
         barriers[0] = BarrierFactory.generateLeftLBlock(8, 10, 6, 3);
@@ -70,6 +73,8 @@ public class SpriteMoveBarriers extends Applet implements Runnable {
             bg.fillPolygon(p);
         }
         bg.dispose();
+        
+        userbullets = new ArrayList<Bullet>();
     }
     
     @Override
@@ -138,6 +143,8 @@ public class SpriteMoveBarriers extends Applet implements Runnable {
                     }
                 }
             }
+            
+            //@TODO: implement shooting, then collision detection for every bullet
             
             ogr = buffer.createGraphics();
             ogr.setColor(Color.white);
