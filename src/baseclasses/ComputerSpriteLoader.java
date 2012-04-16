@@ -29,7 +29,7 @@ public class ComputerSpriteLoader {
         BufferedImage loaded;
         while (direction <= 345) {
             try {
-                loaded = ImageIO.read(ComputerSpriteLoader.class.getClass().getResource("/resources/playersprites/cs" + Integer.toString(direction) + ".png"));
+                loaded = ImageIO.read(ComputerSpriteLoader.class.getClass().getResource("/resources/cpusprites/cs" + Integer.toString(direction) + ".png"));
             } catch (IOException ex) {
                 loaded = new BufferedImage(40, 40, BufferedImage.BITMASK);
             }

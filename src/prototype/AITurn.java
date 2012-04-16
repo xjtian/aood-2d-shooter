@@ -21,31 +21,32 @@ import java.util.ArrayList;
  */
 public class AITurn extends Applet implements Runnable {
 
-    private boolean[] commands = new boolean[32767];
-    private int x = 200;
-    private int y = 200;
+    private boolean[] commands = new boolean[32767];    //key and mouse commands
+    private int x = 200;    //player x
+    private int y = 200;    //player y
     
-    //@TODO: cpu sprite turn directions in photoshop
-    private int cx = 300;
-    private int cy = 300;
+    private int cx = 300;   //cpu x
+    private int cy = 300;   //cpu y
     
-    private int mx = 200;
-    private int my = 100;
+    private int mx = 200;   //mouse x
+    private int my = 100;   //mouse y
     
-    private Thread gameLoop;
-    private boolean stopFlag = true;
+    private Thread gameLoop;    //game loop thread
+    private boolean stopFlag = true;    //game loop stop flag
     
+    //for framerate calculation
     private int frames = 0;
     private long time = System.currentTimeMillis();
     
     private BufferedImage bgimage;
-    private boolean[][] map;
-    private Polygon[] barriers;
+    private boolean[][] map;    //tile layout of map
+    private Polygon[] barriers; //all barriers in map
     
-    private ArrayList<Bullet> userbullets;
+    private ArrayList<Bullet> userbullets;  //yellow bullets
+    private ArrayList<Bullet> cpubullets;   //red bullets
     
-    private BufferedImage buffer;
-    private Graphics2D ogr;
+    private BufferedImage buffer;   //offscreen buffer
+    private Graphics2D ogr; //offscreen graphics handle
     
     {
         PlayerSpriteLoader.loadAllImages();
@@ -80,6 +81,7 @@ public class AITurn extends Applet implements Runnable {
         bg.dispose();
         
         userbullets = new ArrayList<Bullet>();
+        cpubullets = new ArrayList<Bullet>();
     }
     
     @Override
@@ -93,14 +95,20 @@ public class AITurn extends Applet implements Runnable {
     @Override
     public void run() {
         long lastTime = System.currentTimeMillis();
-        while (stopFlag) {
+        long loopController = System.currentTimeMillis();
+        gameloop: while (stopFlag) {
+            if (System.currentTimeMillis() - loopController < 4)    //upper limit 250fps
+                continue gameloop;
+            else
+                loopController = System.currentTimeMillis();
+            
             long interval = System.currentTimeMillis() - lastTime;
             if (interval > 100) 
                 lastTime = System.currentTimeMillis();
             
             double radians = Math.atan2((double) (y + 20 - my), (double) (x + 20 -mx));
             int dir = (int)Math.toDegrees(radians);
-            
+            //@TODO: some way to introduce a slight amount of randomness to bullet trajectory
             dir = (dir%15 > 7) ? dir+(15 - dir%15):dir - dir%15;
             dir -=90;
             
@@ -108,6 +116,17 @@ public class AITurn extends Applet implements Runnable {
                 dir = 360 + dir;
             if (dir == 360)
                 dir = 0;
+            
+            double cradians = Math.atan2((double) (cy - y - 15), (double) (cx - x - 15));
+            int cdir = (int)Math.toDegrees(cradians);
+            //@TODO: some way to introduce a slight amount of randomness to bullet trajectory
+            cdir = (cdir%15 > 7) ? cdir+(15 - cdir%15):cdir - cdir%15;
+            cdir -=90;
+            
+            if (cdir < 0)
+                cdir = 360 + cdir;
+            if (cdir == 360)
+                cdir = 0;
             
             if (commands[KeyEvent.VK_A]) {
                 x--;
@@ -157,18 +176,21 @@ public class AITurn extends Applet implements Runnable {
             if (interval > 100) {
                 if (commands[MouseEvent.BUTTON1])
                     userbullets.add(new Bullet(x+15, y+15, Math.toRadians((double) (90-dir)), true));
+                cpubullets.add(new Bullet(cx+5, cy+5, Math.toRadians((double) (90-cdir)), false));
             }
             
             if (interval > 10) {
                 for (Bullet b : userbullets)
                     b.move();
+                for (Bullet b : cpubullets)
+                    b.move();
             }
             
-            inbullets: for (int i = userbullets.size() -1; i >= 0; i--) {
+            inuserbullets: for (int i = userbullets.size() -1; i >= 0; i--) {
                 for (int j = 0; j < barriers.length; j++) {
                     if (barriers[j].intersects(userbullets.get(i).getBounds())) {
                         userbullets.remove(i);
-                        continue inbullets;
+                        continue inuserbullets;
                     }
                 }
                 
@@ -176,26 +198,37 @@ public class AITurn extends Applet implements Runnable {
                 int by = userbullets.get(i).getY();
                 if (bx < 0 || bx > 400 || by < 0 || by > 400) {
                     userbullets.remove(i);
-                    continue inbullets;
+                    continue inuserbullets;
                 }
                 
                 if (userbullets.get(i).getBounds().intersects(new Rectangle(cx, cy, 20, 20))) {
                     userbullets.remove(i);
-                    //User hit the computer
+                    //User hit the computer - extra details later
                 }
             }
             
-            double cradians = Math.atan2((double) (cy - y), (double) (cx - x));
-            int cdir = (int)Math.toDegrees(cradians);
+            incpubullets: for (int i = cpubullets.size() -1; i >= 0; i--) {
+                for (int j = 0; j < barriers.length; j++) {
+                    if (barriers[j].intersects(cpubullets.get(i).getBounds())) {
+                        cpubullets.remove(i);
+                        continue incpubullets;
+                    }
+                }
+                
+                int bx = cpubullets.get(i).getX();
+                int by = cpubullets.get(i).getY();
+                if (bx < 0 || bx > 400 || by < 0 || by > 400) {
+                    cpubullets.remove(i);
+                    continue incpubullets;
+                }
+                
+                if (cpubullets.get(i).getBounds().intersects(new Rectangle(x, y, 40, 40))) {
+                    cpubullets.remove(i);
+                    //computer hit the user - extra details later
+                }
+            }
             
-            cdir = (cdir%15 > 7) ? cdir+(15 - cdir%15):cdir - cdir%15;
-            cdir -=90;
-            
-            if (cdir < 0)
-                cdir = 360 + cdir;
-            if (cdir == 360)
-                cdir = 0;
-            
+            //Paint all components to buffer
             ogr = buffer.createGraphics();
             ogr.setColor(Color.white);
             ogr.fillRect(0, 0, 400, 400);
@@ -204,8 +237,11 @@ public class AITurn extends Applet implements Runnable {
             ogr.drawImage(ComputerSpriteLoader.getSprite(cdir), cx, cy, null);
             for (Bullet b : userbullets)
                 b.draw(ogr);
+            for (Bullet b : cpubullets)
+                b.draw(ogr);
             ogr.dispose();
             
+            //transfer buffer
             this.getGraphics().drawImage(buffer, 0, 0, null);
             frames++;
         }
