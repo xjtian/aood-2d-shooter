@@ -151,7 +151,7 @@ public class MoveAndShoot extends Applet implements Runnable {
             
             if (interval > 100) {
                 if (commands[MouseEvent.BUTTON1])
-                    userbullets.add(new Bullet(x+15, y+15, Math.toRadians((double) (90-dir)), true));
+                    userbullets.add(new Bullet(x+15, y+15, mx, my, true));
             }
             
             if (interval > 10) {
