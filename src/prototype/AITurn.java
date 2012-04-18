@@ -97,10 +97,17 @@ public class AITurn extends Applet implements Runnable {
         long lastTime = System.currentTimeMillis();
         long loopController = System.currentTimeMillis();
         gameloop: while (stopFlag) {
-            if (System.currentTimeMillis() - loopController < 4)    //upper limit 250fps
-                continue gameloop;
-            else
-                loopController = System.currentTimeMillis();
+//            if (System.currentTimeMillis() - loopController < 4)    //upper limit 250fps
+//                continue gameloop;
+//            else
+//                loopController = System.currentTimeMillis();
+            long t = System.currentTimeMillis();
+            if (t < 4) {
+                try {
+                    Thread.sleep(5 - t);
+                } catch (InterruptedException e) {}
+                loopController = t;
+            }
             
             long interval = System.currentTimeMillis() - lastTime;
             if (interval > 100) 
@@ -108,7 +115,7 @@ public class AITurn extends Applet implements Runnable {
             
             double radians = Math.atan2((double) (y + 20 - my), (double) (x + 20 -mx));
             int dir = (int)Math.toDegrees(radians);
-            //@TODO: some way to introduce a slight amount of randomness to bullet trajectory
+            
             dir = (dir%15 > 7) ? dir+(15 - dir%15):dir - dir%15;
             dir -=90;
             
@@ -119,7 +126,7 @@ public class AITurn extends Applet implements Runnable {
             
             double cradians = Math.atan2((double) (cy - y - 15), (double) (cx - x - 15));
             int cdir = (int)Math.toDegrees(cradians);
-            //@TODO: some way to introduce a slight amount of randomness to bullet trajectory
+            
             cdir = (cdir%15 > 7) ? cdir+(15 - cdir%15):cdir - cdir%15;
             cdir -=90;
             
@@ -175,8 +182,8 @@ public class AITurn extends Applet implements Runnable {
             
             if (interval > 100) {
                 if (commands[MouseEvent.BUTTON1])
-                    userbullets.add(new Bullet(x+15, y+15, Math.toRadians((double) (90-dir)), true));
-                cpubullets.add(new Bullet(cx+5, cy+5, Math.toRadians((double) (90-cdir)), false));
+                    userbullets.add(new Bullet(x+15, y+15, Math.toRadians((double) (90-dir) + (((int)2*Math.random())*-1.0)*(10.0 + 5*Math.random())), true));
+                cpubullets.add(new Bullet(cx+5, cy+5, Math.toRadians((double) (90-cdir) + (((int)2*Math.random())*-1.0)*(10.0 + 5*Math.random())), false));
             }
             
             if (interval > 10) {
