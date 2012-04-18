@@ -22,7 +22,7 @@ public class BulletTest {
     @Test
     public void testMove() {
         System.out.println("Move and Draw");
-        final Bullet b = new Bullet(90, 300, Math.PI / 4, false);
+        final Bullet b = new Bullet(90, 300, 100, 290, false);
         
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

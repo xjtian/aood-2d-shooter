@@ -20,8 +20,13 @@ public class Bullet {
     private int x;
     private int y;
     
-    private double angle;
+    private double slope;
     private boolean human;
+    
+    private boolean negativex;
+    private boolean negativey;
+    
+    private final double VEL = 4.0;
     
     private static BufferedImage hsprite;
     private static BufferedImage csprite;
@@ -39,17 +44,14 @@ public class Bullet {
         }
     }
     
-    /**
-     * Instantiates a bullet.
-     * @param x x-coordinate of shot.
-     * @param y y-coordinate of shot.
-     * @param angle angle of shot, in radians.
-     * @param human whether or not the bullet is yellow.
-     */
-    public Bullet(int x, int y, double angle, boolean human) {
+    public Bullet(int x, int y, int mx, int my, boolean human) {
         this.x = x;
         this.y = y;
-        this.angle = angle;
+        if (mx - x == 0)
+            x--;
+        this.slope = Math.abs(((double) (my - y) / (double) (mx - x)));
+        negativex = (mx - x) < 0;
+        negativey = (my - y) < 0;
         this.human = human;
     }
     
@@ -57,11 +59,13 @@ public class Bullet {
      * Moves the bullet along its path.
      */
     public void move() {
-        double vmove = Math.sin(angle) * 5;
-        double hmove = Math.cos(angle) * 5;
+        double dx = Math.sqrt((VEL*VEL) / (1 + (slope*slope)));
+        double dy = slope * dx;
         
-        x = (hmove > 1.0 || hmove < -1.0) ? x + (int)hmove : x + 1;
-        y = (vmove > 1.0 || vmove < -1.0) ? y - (int)vmove : y + 1;
+        dy = dy + 5*Math.random() - 2.5;
+        
+        x = (negativex) ? x - (int)dx : x + (int)dx;
+        y = (negativey) ? y - (int)dy : y + (int)dy;
     }
     
     /**

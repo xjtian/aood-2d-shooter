@@ -24,9 +24,11 @@ public class AITurn extends Applet implements Runnable {
     private boolean[] commands = new boolean[32767];    //key and mouse commands
     private int x = 200;    //player x
     private int y = 200;    //player y
+    private int health = 100;
     
     private int cx = 300;   //cpu x
     private int cy = 300;   //cpu y
+    private int chealth = 100;
     
     private int mx = 200;   //mouse x
     private int my = 100;   //mouse y
@@ -101,13 +103,13 @@ public class AITurn extends Applet implements Runnable {
 //                continue gameloop;
 //            else
 //                loopController = System.currentTimeMillis();
-            long t = System.currentTimeMillis();
+            long t = System.currentTimeMillis() - loopController;
             if (t < 4) {
                 try {
-                    Thread.sleep(5 - t);
+                    Thread.sleep(4 - t);
                 } catch (InterruptedException e) {}
-                loopController = t;
             }
+            loopController = t;
             
             long interval = System.currentTimeMillis() - lastTime;
             if (interval > 100) 
@@ -182,8 +184,9 @@ public class AITurn extends Applet implements Runnable {
             
             if (interval > 100) {
                 if (commands[MouseEvent.BUTTON1])
-                    userbullets.add(new Bullet(x+15, y+15, Math.toRadians((double) (90-dir) + (((int)2*Math.random())*-1.0)*(10.0 + 5*Math.random())), true));
-                cpubullets.add(new Bullet(cx+5, cy+5, Math.toRadians((double) (90-cdir) + (((int)2*Math.random())*-1.0)*(10.0 + 5*Math.random())), false));
+                    userbullets.add(new Bullet(x+15, y+15, mx, my, true));
+                if (Math.random() < .5)
+                    cpubullets.add(new Bullet(cx+5, cy+5, x, y, false));
             }
             
             if (interval > 10) {
@@ -210,7 +213,7 @@ public class AITurn extends Applet implements Runnable {
                 
                 if (userbullets.get(i).getBounds().intersects(new Rectangle(cx, cy, 20, 20))) {
                     userbullets.remove(i);
-                    //User hit the computer - extra details later
+                    chealth-=2;
                 }
             }
             
@@ -231,7 +234,7 @@ public class AITurn extends Applet implements Runnable {
                 
                 if (cpubullets.get(i).getBounds().intersects(new Rectangle(x, y, 40, 40))) {
                     cpubullets.remove(i);
-                    //computer hit the user - extra details later
+                    health-=2;
                 }
             }
             
@@ -242,6 +245,10 @@ public class AITurn extends Applet implements Runnable {
             ogr.drawImage(bgimage, null, 0, 0);
             ogr.drawImage(PlayerSpriteLoader.getSprite(dir), x, y, null);
             ogr.drawImage(ComputerSpriteLoader.getSprite(cdir), cx, cy, null);
+            ogr.setColor(Color.green);
+            ogr.fillRect(380, 10, 10, health / 2);
+            ogr.setColor(Color.red);
+            ogr.fillRect(360, 10, 10, chealth / 2);
             for (Bullet b : userbullets)
                 b.draw(ogr);
             for (Bullet b : cpubullets)
@@ -251,6 +258,24 @@ public class AITurn extends Applet implements Runnable {
             //transfer buffer
             this.getGraphics().drawImage(buffer, 0, 0, null);
             frames++;
+            
+            if (health <= 0) {
+                System.out.println("You lost");
+                long time2 = System.currentTimeMillis();
+                stopFlag = false;
+                int framerate =  (int) (frames / ((time2 - time) / 1000));
+                System.out.println("Average " + framerate + "fps");
+                System.exit(0);
+            }
+            
+            if (chealth <= 0) {
+                System.out.println("You won");
+                long time2 = System.currentTimeMillis();
+                stopFlag = false;
+                int framerate =  (int) (frames / ((time2 - time) / 1000));
+                System.out.println("Average " + framerate + "fps");
+                System.exit(0);
+            }
         }
     }
     
