@@ -17,9 +17,9 @@ import java.util.ArrayList;
 
 /**
  *
- * @author xtian8741
+ * @author jacky
  */
-public class AITurn extends Applet implements Runnable {
+public class AIMove extends Applet implements Runnable {
 
     private boolean[] commands = new boolean[32767];    //key and mouse commands
     private int x = 200;    //player x
@@ -181,6 +181,31 @@ public class AITurn extends Applet implements Runnable {
                     }
                 }
             }
+            
+            //@TODO: implement the simple cpu pathfinding algorithm.
+            int cgx = cx / 20;
+            int cgy = cy / 20;
+            
+            int dx = x - cx;
+            int dy = y - cy;
+            
+            //new coordinates
+            int nx = (dx < 0) ? cx - 1 : cx + 1;
+            int ny = (dy < 0) ? cy - 1 : cy + 1;
+            int ngx = nx / 20;
+            int ngy = ny / 20;
+            
+            //Check for out of bounds first
+            //Only move in non-bounded direction.
+            //Then check for barrier.
+            //Find out which way the barrier is, then move only in the possible direction.
+//            if ((ngx != cgx) || (ngy != cgy)) {
+//                if (!map[ngx][ngy]) {
+//                    cx = nx;
+//                    cy = ny;
+//                } else {
+//                }
+//            }
             
             if (interval > 100) {
                 if (commands[MouseEvent.BUTTON1])
