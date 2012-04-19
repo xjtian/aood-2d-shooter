@@ -24,7 +24,7 @@ public class AIMove extends Applet implements Runnable {
     private boolean[] commands = new boolean[32767];    //key and mouse commands
     private int x = 200;    //player x
     private int y = 200;    //player y
-    private int health = 100;
+    private int health = 200;
     
     private int cx = 300;   //cpu x
     private int cy = 300;   //cpu y
@@ -96,24 +96,19 @@ public class AIMove extends Applet implements Runnable {
 
     @Override
     public void run() {
-        long lastTime = System.currentTimeMillis();
-        long loopController = System.currentTimeMillis();
+        long lastTime = System.currentTimeMillis(); //shoot delay
+        long loopController = System.currentTimeMillis(); //fps limiter
+        long bulletInterval = System.currentTimeMillis(); //bullet movement delay
         gameloop: while (stopFlag) {
-            if (System.currentTimeMillis() - loopController < 4)    //upper limit 250fps
-                continue gameloop;
-            else
-                loopController = System.currentTimeMillis();
-//            long t = System.currentTimeMillis() - loopController;
-//            if (t < 4) {
-//                try {
-//                    Thread.sleep(4 - t);
-//                } catch (InterruptedException e) {}
-//            }
-//            loopController = t;
+            //@TODO: more effective fps delimiter
             
             long interval = System.currentTimeMillis() - lastTime;
             if (interval > 100) 
                 lastTime = System.currentTimeMillis();
+            
+            long bint = System.currentTimeMillis() - bulletInterval;
+            if (bint > 10)
+                bulletInterval = System.currentTimeMillis();
             
             double radians = Math.atan2((double) (y + 20 - my), (double) (x + 20 -mx));
             int dir = (int)Math.toDegrees(radians);
@@ -138,34 +133,34 @@ public class AIMove extends Applet implements Runnable {
                 cdir = 0;
             
             if (commands[KeyEvent.VK_A]) {
-                x--;
+                x-=2;
                 if (x < 0)
-                    x++;
+                    x+=2;
                 for (Polygon p : barriers) {
                     if (p.intersects(new Rectangle(x, y, 40, 40))) {
-                        x++;
+                        x+=2;
                         break;
                     }
                 }
             }
             if (commands[KeyEvent.VK_D]) {
-                x++;
+                x+=2;
                 if (x > 360)
-                    x--;
+                    x-=2;
                 for (Polygon p : barriers) {
                     if (p.intersects(new Rectangle(x, y, 40, 40))) {
-                        x--;
+                        x-=2;
                         break;
                     }
                 }
             }
             if (commands[KeyEvent.VK_W]) {
-                y--;
+                y-=2;
                 if (y < 0)
-                    y++;
+                    y+=2;
                 for (Polygon p : barriers) {
                     if (p.intersects(new Rectangle(x, y, 40, 40))) {
-                        y++;
+                        y+=2;
                         break;
                     }
                 }
@@ -173,39 +168,40 @@ public class AIMove extends Applet implements Runnable {
             if (commands[KeyEvent.VK_S]) {
                 y++;
                 if (y > 360)
-                    y--;
+                    y-=2;
                 for (Polygon p : barriers) {
                     if (p.intersects(new Rectangle(x, y, 40, 40))) {
-                        y--;
+                        y-=2;
                         break;
                     }
                 }
             }
             
-            //@TODO: implement the simple cpu pathfinding algorithm.
-            int cgx = cx / 20;
-            int cgy = cy / 20;
-            
             int dx = x - cx;
             int dy = y - cy;
             
-            //new coordinates
             int nx = (dx < 0) ? cx - 1 : cx + 1;
-            int ny = (dy < 0) ? cy - 1 : cy + 1;
-            int ngx = nx / 20;
-            int ngy = ny / 20;
+            boolean inters = false;
+            if (nx < 380 && nx > 0) {
+                for (Polygon p : barriers) {
+                    inters = p.intersects(new Rectangle(nx, cy, 20, 20));
+                    if (inters) break;
+                }
+            }
             
-            //Check for out of bounds first
-            //Only move in non-bounded direction.
-            //Then check for barrier.
-            //Find out which way the barrier is, then move only in the possible direction.
-//            if ((ngx != cgx) || (ngy != cgy)) {
-//                if (!map[ngx][ngy]) {
-//                    cx = nx;
-//                    cy = ny;
-//                } else {
-//                }
-//            }
+            if (!inters) cx = nx;
+            
+            int ny = (dy < 0) ? cy - 1 : cy + 1;
+            
+            inters = false;
+            if (ny < 380 && ny > 0) {
+                for (Polygon p : barriers) {
+                    inters = p.intersects(new Rectangle(cx, ny, 20, 20));
+                    if (inters) break;
+                }
+            }
+            
+            if (!inters) cy = ny;
             
             if (interval > 100) {
                 if (commands[MouseEvent.BUTTON1])
@@ -214,7 +210,7 @@ public class AIMove extends Applet implements Runnable {
                     cpubullets.add(new Bullet(cx+5, cy+5, x, y, false));
             }
             
-            if (interval > 10) {
+            if (bint > 10) {
                 for (Bullet b : userbullets)
                     b.move();
                 for (Bullet b : cpubullets)
@@ -263,6 +259,9 @@ public class AIMove extends Applet implements Runnable {
                 }
             }
             
+            if (new Rectangle(x, y, 40, 40).intersects(new Rectangle(cx, cy, 20, 20)))
+                health--;
+            
             //Paint all components to buffer
             ogr = buffer.createGraphics();
             ogr.setColor(Color.white);
@@ -279,7 +278,7 @@ public class AIMove extends Applet implements Runnable {
             for (Bullet b : cpubullets)
                 b.draw(ogr);
             ogr.dispose();
-            
+
             //transfer buffer
             this.getGraphics().drawImage(buffer, 0, 0, null);
             frames++;
