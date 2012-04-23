@@ -96,19 +96,11 @@ public class AIMove extends Applet implements Runnable {
 
     @Override
     public void run() {
-        long lastTime = System.currentTimeMillis(); //shoot delay
-        long loopController = System.currentTimeMillis(); //fps limiter
-        long bulletInterval = System.currentTimeMillis(); //bullet movement delay
+        long loopController = System.currentTimeMillis();
         gameloop: while (stopFlag) {
-            //@TODO: more effective fps delimiter
-            
-            long interval = System.currentTimeMillis() - lastTime;
-            if (interval > 100) 
-                lastTime = System.currentTimeMillis();
-            
-            long bint = System.currentTimeMillis() - bulletInterval;
-            if (bint > 10)
-                bulletInterval = System.currentTimeMillis();
+            long dt = System.currentTimeMillis() - loopController;
+            if (dt > 100)
+                loopController = System.currentTimeMillis();
             
             double radians = Math.atan2((double) (y + 20 - my), (double) (x + 20 -mx));
             int dir = (int)Math.toDegrees(radians);
@@ -132,46 +124,50 @@ public class AIMove extends Applet implements Runnable {
             if (cdir == 360)
                 cdir = 0;
             
+            //User movement max 3 px every 100ms
+            int umove = (int) (dt / 100) + 2;
+            
+            
             if (commands[KeyEvent.VK_A]) {
-                x-=2;
+                x-=umove;
                 if (x < 0)
-                    x+=2;
+                    x+=umove;
                 for (Polygon p : barriers) {
                     if (p.intersects(new Rectangle(x, y, 40, 40))) {
-                        x+=2;
+                        x+=umove;
                         break;
                     }
                 }
             }
             if (commands[KeyEvent.VK_D]) {
-                x+=2;
+                x+=umove;
                 if (x > 360)
-                    x-=2;
+                    x-=umove;
                 for (Polygon p : barriers) {
                     if (p.intersects(new Rectangle(x, y, 40, 40))) {
-                        x-=2;
+                        x-=umove;
                         break;
                     }
                 }
             }
             if (commands[KeyEvent.VK_W]) {
-                y-=2;
+                y-=umove;
                 if (y < 0)
-                    y+=2;
+                    y+=umove;
                 for (Polygon p : barriers) {
                     if (p.intersects(new Rectangle(x, y, 40, 40))) {
-                        y+=2;
+                        y+=umove;
                         break;
                     }
                 }
             }
             if (commands[KeyEvent.VK_S]) {
-                y++;
+                y+=umove;
                 if (y > 360)
-                    y-=2;
+                    y-=umove;
                 for (Polygon p : barriers) {
                     if (p.intersects(new Rectangle(x, y, 40, 40))) {
-                        y-=2;
+                        y-=umove;
                         break;
                     }
                 }
@@ -179,8 +175,9 @@ public class AIMove extends Applet implements Runnable {
             
             int dx = x - cx;
             int dy = y - cy;
+            int cmove = (int)(dt / 200) + 1;
             
-            int nx = (dx < 0) ? cx - 1 : cx + 1;
+            int nx = (dx < 0) ? cx - cmove : cx + cmove;
             boolean inters = false;
             if (nx < 380 && nx > 0) {
                 for (Polygon p : barriers) {
@@ -191,7 +188,7 @@ public class AIMove extends Applet implements Runnable {
             
             if (!inters) cx = nx;
             
-            int ny = (dy < 0) ? cy - 1 : cy + 1;
+            int ny = (dy < 0) ? cy - cmove : cy + cmove;
             
             inters = false;
             if (ny < 380 && ny > 0) {
@@ -203,19 +200,17 @@ public class AIMove extends Applet implements Runnable {
             
             if (!inters) cy = ny;
             
-            if (interval > 100) {
+            if (dt > 100) {
                 if (commands[MouseEvent.BUTTON1])
                     userbullets.add(new Bullet(x+15, y+15, mx, my, true));
                 if (Math.random() < .5)
                     cpubullets.add(new Bullet(cx+5, cy+5, x, y, false));
             }
             
-            if (bint > 10) {
-                for (Bullet b : userbullets)
-                    b.move();
-                for (Bullet b : cpubullets)
-                    b.move();
-            }
+            for (Bullet b : userbullets)
+                b.move();
+            for (Bullet b : cpubullets)
+                b.move();
             
             inuserbullets: for (int i = userbullets.size() -1; i >= 0; i--) {
                 for (int j = 0; j < barriers.length; j++) {
