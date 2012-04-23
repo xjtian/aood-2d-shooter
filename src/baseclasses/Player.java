@@ -4,9 +4,12 @@
  */
 package baseclasses;
 
+import java.awt.Graphics2D;
+
 /**
- *
- * @author xtian8741
+ * Player class that represents a human player in the game. 
+ * 
+ * @author Jacky Tian
  */
 public class Player {
     protected int direction;
@@ -21,10 +24,42 @@ public class Player {
         direction = 0;
     }
     
-    //@TODO: setter and getter methods in Player for each field
+    public void move(int dx, int dy) {
+        x += dx;
+        y += dy;
+    }
     
-    //@TODO: movement methods in Player for each field.
+    public int getX() {
+        return x;
+    }
     
-    //@TODO: draw method in Player
+    public int getY() {
+        return y;
+    }
+    
+    public void damage(int damage) {
+        health -= damage;
+    }
+    
+    public void heal(int heal) {
+        health += heal;
+    }
+    
+    public void setDirection(int dir) {
+        this.direction = dir;
+    }
+    
+    public int getDirection() {
+        return direction;
+    }
+    
+    public void draw(Graphics2D g) {
+        g.drawImage(PlayerSpriteLoader.getSprite(direction), x, y, null);
+    }
+    
+    public void draw(Graphics2D g, int dir) {
+        this.direction = dir;
+        g.drawImage(PlayerSpriteLoader.getSprite(direction), x, y, null);
+    }
     
 }
