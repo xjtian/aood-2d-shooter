@@ -53,6 +53,14 @@ public class Player {
         return direction;
     }
     
+    public int getHealth() {
+        return health;
+    }
+    
+    public java.awt.Rectangle getBounds() {
+        return new java.awt.Rectangle(x, y, 40, 40);
+    }
+    
     public void draw(Graphics2D g) {
         g.drawImage(PlayerSpriteLoader.getSprite(direction), x, y, null);
     }

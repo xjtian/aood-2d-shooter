@@ -175,7 +175,7 @@ public class AIMove extends Applet implements Runnable {
             
             int dx = x - cx;
             int dy = y - cy;
-            int cmove = (int)(dt / 200) + 1;
+            int cmove = (int)(dt / 200) + 1;    //max 2px every 200ms
             
             int nx = (dx < 0) ? cx - cmove : cx + cmove;
             boolean inters = false;

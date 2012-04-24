@@ -18,6 +18,11 @@ public class ComputerPlayer extends Player {
     }
     
     @Override
+    public java.awt.Rectangle getBounds() {
+        return new java.awt.Rectangle(super.x, super.y, 20, 20);
+    }
+    
+    @Override
     public void draw(Graphics2D g) {
         g.drawImage(ComputerSpriteLoader.getSprite(super.direction), super.x, super.y, null);
     }
