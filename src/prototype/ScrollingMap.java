@@ -24,6 +24,7 @@ public class ScrollingMap extends Applet implements Runnable {
     
     private Player human;
     private ArrayList<ComputerPlayer> cpuPlayers;
+    private ArrayList<ComputerPlayer> frozenCPU;    //computer players that haven't been discovered
     
     private int mx = 200;   //mouse x
     private int my = 100;   //mouse y
@@ -141,6 +142,8 @@ public class ScrollingMap extends Applet implements Runnable {
         cpuPlayers.add(new ComputerPlayer(500, 500));
         cpuPlayers.add(new ComputerPlayer(700, 420));
         
+        frozenCPU = new ArrayList<ComputerPlayer>();
+        
         //@TODO: Evenly distribute cpu players across every 'grid'
         //@TODO: CPU players are stationary until they are first discovered?
         
@@ -163,10 +166,14 @@ public class ScrollingMap extends Applet implements Runnable {
     @Override
     public void run() {
         long loopController = System.currentTimeMillis();
+        long bulletDelay = System.currentTimeMillis();
         gameloop: while(stopFlag) {
             long dt = System.currentTimeMillis() - loopController;
-            if (dt > 50)
-                loopController = System.currentTimeMillis();
+            loopController = System.currentTimeMillis();
+            
+            long bdt = System.currentTimeMillis() - bulletDelay;
+            if (bdt > 50)
+                bulletDelay = System.currentTimeMillis();
             
             //computations regarding human and computer directions
             double radians = Math.atan2((double) (human.getY() + 20 - my - camy), (double) (human.getX() + 20 - mx - camx));
@@ -199,8 +206,8 @@ public class ScrollingMap extends Applet implements Runnable {
                 cp.setDirection(cdir);
             }
             
-            //User movement max 3 px every 100ms
-            int umove = (int) (dt / 100) + 2;
+            int umove = (int) (dt / 2);
+            if (umove == 0) umove = 1;
             
             if (commands[KeyEvent.VK_A] || commands[KeyEvent.VK_LEFT]) {
                 human.move(-umove, 0);
@@ -250,8 +257,13 @@ public class ScrollingMap extends Applet implements Runnable {
             //Start cpu movement logic
             int dx, dy;
             boolean inters = false;
-            int cmove = (int)(dt / 200) + 1;
-            for (ComputerPlayer cp : cpuPlayers) {
+            int cmove = (int)(dt / 4);
+            if (cmove == 0) cmove = (int)(Math.random() * 2);
+            
+            cpumovement: for (ComputerPlayer cp : cpuPlayers) {
+                if (cmove == 0)
+                    break cpumovement;
+                
                 //horizontal movement
                 dx = human.getX() - cp.getX();
                 if (dx < 0)
@@ -321,7 +333,7 @@ public class ScrollingMap extends Applet implements Runnable {
             }
             
             //Shooting bullets
-            if (dt > 50) {
+            if (bdt > 50) {
                 if (commands[MouseEvent.BUTTON1])
                     userbullets.add(new Bullet(human.getX()+15-camx, human.getY()+15-camy, mx, my, true));
                 for (ComputerPlayer cp : cpuPlayers) {
@@ -387,7 +399,9 @@ public class ScrollingMap extends Applet implements Runnable {
                     human.damage(2);
                 }
             }
-            if (dt > 50) {
+            
+            //cpu collision with player
+            if (bdt > 50) {
                 for (ComputerPlayer cp : cpuPlayers) {
                     if (cp.getBounds().intersects(human.getBounds()))
                         human.damage(1);
