@@ -70,4 +70,13 @@ public class Player {
         g.drawImage(PlayerSpriteLoader.getSprite(direction), x, y, null);
     }
     
+    public void draw(Graphics2D g, int ix, int iy) {
+        g.drawImage(PlayerSpriteLoader.getSprite(direction), ix, iy, null);
+    }
+    
+    public void draw(Graphics2D g, int dir, int ix, int iy) {
+        this.direction = dir;
+        g.drawImage(PlayerSpriteLoader.getSprite(direction), ix, iy, null);
+    }
+    
 }

@@ -32,4 +32,15 @@ public class ComputerPlayer extends Player {
         super.direction = dir;
         g.drawImage(ComputerSpriteLoader.getSprite(super.direction), super.x, super.y, null);
     }
+    
+    @Override
+    public void draw(Graphics2D g, int ix, int iy) {
+        g.drawImage(ComputerSpriteLoader.getSprite(direction), ix, iy, null);
+    }
+    
+    @Override
+    public void draw(Graphics2D g, int dir, int ix, int iy) {
+        this.direction = dir;
+        g.drawImage(ComputerSpriteLoader.getSprite(direction), ix, iy, null);
+    }
 }

@@ -109,4 +109,8 @@ public class Bullet {
     public Rectangle getBounds() {
         return new Rectangle(x, y, 10, 10);
     }
+    
+    public Rectangle getShiftedBounds(int offx, int offy) {
+        return new Rectangle(x+offx, y+offy, 10, 10);
+    }
 }
