@@ -6,15 +6,19 @@ package prototype;
 
 import baseclasses.*;
 import java.applet.Applet;
-import java.awt.*;
+import java.awt.AWTEvent;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
- *
- * @author xtian8741
+ * Demo applet of the game with a scrolling map and camera that follows the player.
+ * 
+ * @author Jacky Tian
  */
 public class ScrollingMap extends Applet implements Runnable {
     private boolean[] commands = new boolean[32767];    //key and mouse commands
@@ -25,6 +29,8 @@ public class ScrollingMap extends Applet implements Runnable {
     
     private int mx = 200;   //mouse x
     private int my = 100;   //mouse y
+    
+    private int ammo = CLIP_SIZE;
     
     private Thread gameLoop;    //game loop thread
     private boolean stopFlag = true;    //game loop stop flag
@@ -47,6 +53,8 @@ public class ScrollingMap extends Applet implements Runnable {
     private int camy;   //camera y-offset
     
     private static final int DIM = 1200;
+    private static final int GRID_SIZE = DIM / 20;
+    private static final int CLIP_SIZE = 75;
     
     {
         PlayerSpriteLoader.loadAllImages();
@@ -110,7 +118,7 @@ public class ScrollingMap extends Applet implements Runnable {
         barriers.add(BarrierFactory.generateRectangleBlock(52, 56, 7, 1));
         barriers.add(BarrierFactory.generateRectangleBlock(53, 54, 1, 2));
         
-        map = new boolean[60][60];
+        map = new boolean[GRID_SIZE][GRID_SIZE];
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
                 for (Polygon p : barriers) {
@@ -135,13 +143,13 @@ public class ScrollingMap extends Applet implements Runnable {
         
         //Add all players
         cpuPlayers = new ArrayList<ComputerPlayer>();
-        
         frozenCPU = new ArrayList<ComputerPlayer>();
+        
         int numcpu = 0;
         int placex, placey;
         placecpu: while (numcpu < 15) {
-            placex = (int) (Math.random() * 60);
-            placey = (int) (Math.random() * 60);
+            placex = (int) (Math.random() * GRID_SIZE);
+            placey = (int) (Math.random() * GRID_SIZE);
             
             if (map[placex][placey])
                 continue placecpu;
@@ -170,6 +178,8 @@ public class ScrollingMap extends Applet implements Runnable {
     public void run() {
         long loopController = System.currentTimeMillis();
         long bulletDelay = System.currentTimeMillis();
+        long reloadDelay = System.currentTimeMillis();
+        boolean reload = false;
         gameloop: while(stopFlag) {
             long dt = System.currentTimeMillis() - loopController;
             loopController = System.currentTimeMillis();
@@ -177,6 +187,12 @@ public class ScrollingMap extends Applet implements Runnable {
             long bdt = System.currentTimeMillis() - bulletDelay;
             if (bdt > 50)
                 bulletDelay = System.currentTimeMillis();
+            
+            long rdt = System.currentTimeMillis() - reloadDelay;
+            if (rdt > 500 && reload) {
+                reload = false;
+                ammo = CLIP_SIZE;
+            }
             
             //computations regarding human and computer directions
             double radians = Math.atan2((double) (human.getY() + 20 - my - camy), (double) (human.getX() + 20 - mx - camx));
@@ -254,6 +270,14 @@ public class ScrollingMap extends Applet implements Runnable {
                         human.move(0, -umove);
                         break;
                     }
+                }
+            }
+            
+            //reloading
+            if (commands[KeyEvent.VK_R]) {
+                if (!reload) {
+                    reload = true;
+                    reloadDelay = System.currentTimeMillis();
                 }
             }
             
@@ -337,8 +361,10 @@ public class ScrollingMap extends Applet implements Runnable {
             
             //Shooting bullets
             if (bdt > 50) {
-                if (commands[MouseEvent.BUTTON1])
+                if (commands[MouseEvent.BUTTON1] && ammo > 0 && !reload) {
                     userbullets.add(new Bullet(human.getX()+15-camx, human.getY()+15-camy, mx, my, true));
+                    ammo--;
+                }
                 for (ComputerPlayer cp : cpuPlayers) {
                     if (Math.random() < .5)
                         cpubullets.add(new Bullet(cp.getX() + 5-camx, cp.getY() + 5-camy, human.getX()-camx, human.getY()-camy, false));
@@ -449,6 +475,10 @@ public class ScrollingMap extends Applet implements Runnable {
             int totalbars = 1 + cpuPlayers.size();  //drawing health bars
             ogr.setColor(Color.green);
             ogr.fillRect(400 - 20*totalbars, 10, 10, human.getHealth() / 2);
+            ogr.setColor(Color.yellow);
+            for (int i = 0; i < ammo; i++) {
+                ogr.fillRect(400 - 20*totalbars - 25, 5*i, 15, 3);
+            }
             ogr.setColor(Color.red);
             for (int i = 0; i < cpuPlayers.size(); i++) {
                 ogr.fillRect(400 - 20*(totalbars - i - 1), 10, 10, cpuPlayers.get(i).getHealth() / 2);
