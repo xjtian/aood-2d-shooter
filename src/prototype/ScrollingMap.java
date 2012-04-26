@@ -6,10 +6,7 @@ package prototype;
 
 import baseclasses.*;
 import java.applet.Applet;
-import java.awt.AWTEvent;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -138,14 +135,20 @@ public class ScrollingMap extends Applet implements Runnable {
         
         //Add all players
         cpuPlayers = new ArrayList<ComputerPlayer>();
-        cpuPlayers.add(new ComputerPlayer(460, 460));
-        cpuPlayers.add(new ComputerPlayer(500, 500));
-        cpuPlayers.add(new ComputerPlayer(700, 420));
         
         frozenCPU = new ArrayList<ComputerPlayer>();
-        
-        //@TODO: Evenly distribute cpu players across every 'grid'
-        //@TODO: CPU players are stationary until they are first discovered?
+        int numcpu = 0;
+        int placex, placey;
+        placecpu: while (numcpu < 15) {
+            placex = (int) (Math.random() * 60);
+            placey = (int) (Math.random() * 60);
+            
+            if (map[placex][placey])
+                continue placecpu;
+            
+            frozenCPU.add(new ComputerPlayer(placex*20, placey*20));
+            numcpu++;
+        }
         
         human = new Player(600, 640);
         camx = human.getX() - 180;
@@ -207,7 +210,7 @@ public class ScrollingMap extends Applet implements Runnable {
             }
             
             int umove = (int) (dt / 2);
-            if (umove == 0) umove = 1;
+            if (umove == 0) umove = (int)(Math.random() * 2);
             
             if (commands[KeyEvent.VK_A] || commands[KeyEvent.VK_LEFT]) {
                 human.move(-umove, 0);
@@ -367,7 +370,7 @@ public class ScrollingMap extends Applet implements Runnable {
                 for (ComputerPlayer cp : cpuPlayers) {
                     if (userbullets.get(i).getShiftedBounds(camx, camy).intersects(cp.getBounds())) {
                         userbullets.remove(i);
-                        cp.damage(2);
+                        cp.damage(10);
                         continue inuserbullets;
                     }
                 }
@@ -396,7 +399,7 @@ public class ScrollingMap extends Applet implements Runnable {
                 
                 if (cpubullets.get(i).getShiftedBounds(camx, camy).intersects(human.getBounds())) {
                     cpubullets.remove(i);
-                    human.damage(2);
+                    human.damage(1);
                 }
             }
             
@@ -415,6 +418,24 @@ public class ScrollingMap extends Applet implements Runnable {
             if (camx >= DIM - 400) camx = DIM - 400;
             if (camy <= 0) camy = 0;
             if (camy >= DIM - 400) camy = DIM - 400;
+            
+            //Freezing and unfreezing cpu players
+            int cpx, cpy;
+            for (int i = frozenCPU.size() - 1; i >= 0; i--) {
+                cpx = frozenCPU.get(i).getX();
+                cpy = frozenCPU.get(i).getY();
+                
+                if ((cpx >= camx && cpx <= camx+400) && (cpy >= camy && cpy <= camy+400))
+                    cpuPlayers.add(frozenCPU.remove(i));
+            }
+            
+            for (int i = cpuPlayers.size() - 1; i >= 0; i--) {
+                cpx = cpuPlayers.get(i).getX();
+                cpy = cpuPlayers.get(i).getY();
+                
+                if ((cpx < camx || cpx > camx+400) || (cpy < camy || cpy > camy+400))
+                    frozenCPU.add(cpuPlayers.remove(i));
+            }
                 
             //Paint offscreen
             ogr = buffer.createGraphics();
@@ -451,7 +472,7 @@ public class ScrollingMap extends Applet implements Runnable {
                 System.exit(0);
             }
             
-            if (cpuPlayers.isEmpty()) {
+            if (cpuPlayers.isEmpty() && frozenCPU.isEmpty()) {
                 System.out.println("You won");
                 long time2 = System.currentTimeMillis();
                 stopFlag = false;
