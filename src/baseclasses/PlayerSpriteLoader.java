@@ -21,7 +21,10 @@ import javax.imageio.ImageIO;
  * @author Jacky Tian
  */
 public class PlayerSpriteLoader {
-    private static HashMap<Integer, BufferedImage> sprites = new HashMap<Integer, BufferedImage>();
+    private static final HashMap<Integer, BufferedImage> sprites;
+    static {
+        sprites = new HashMap<Integer, BufferedImage>();
+    }
     public static final int WIDTH = 40;
     public static final int HEIGHT = 40;
     

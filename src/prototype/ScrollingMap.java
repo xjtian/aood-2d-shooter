@@ -6,14 +6,12 @@ package prototype;
 
 import baseclasses.*;
 import java.applet.Applet;
-import java.awt.AWTEvent;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Demo applet of the game with a scrolling map and camera that follows the player.
@@ -46,7 +44,10 @@ public class ScrollingMap extends Applet implements Runnable {
     private ArrayList<Bullet> userbullets;  //yellow bullets
     private ArrayList<Bullet> cpubullets;   //red bullets
     
+    private ArrayList<Powerup> powerups;    //powerups
+    
     private BufferedImage buffer;   //offscreen buffer
+    private Image minimap;  //minimap
     private Graphics2D ogr; //offscreen graphics handle
     
     private int camx;   //camera x-offset
@@ -56,7 +57,8 @@ public class ScrollingMap extends Applet implements Runnable {
     private static final int GRID_SIZE = DIM / 20;
     private static final int CLIP_SIZE = 75;
     
-    {
+    @Override
+    public void init() {
         PlayerSpriteLoader.loadAllImages();
         ComputerSpriteLoader.loadAllImages();
         bgimage = new BufferedImage(1200, 1200, BufferedImage.BITMASK);
@@ -64,59 +66,86 @@ public class ScrollingMap extends Applet implements Runnable {
         buffer = new BufferedImage(400, 400, BufferedImage.BITMASK);
         
         //instantiate map barriers
+        Random r = new Random();
         barriers = new ArrayList<Polygon>();
-        //0, 0
-        barriers.add(BarrierFactory.generateRightFlippedL(5, 4, 3, 5));
-        barriers.add(BarrierFactory.generateLeftLBlock(9, 4, 3, 5));
-        barriers.add(BarrierFactory.generateRectangleBlock(14, 10, 8, 2));
-        barriers.add(BarrierFactory.generateRightLBlock(3, 16, 5, 3));
-        //0, 1
-        barriers.add(BarrierFactory.generateRightFlippedL(5, 23, 4, 3));
-        barriers.add(BarrierFactory.generateRightFlippedL(5, 26, 4, 5));
-        barriers.add(BarrierFactory.generateLeftFlippedL(12, 30, 4, 4));
-        barriers.add(BarrierFactory.generateLeftFlippedL(12, 34, 4, 3));
-        //0, 2
-        barriers.add(BarrierFactory.generateRightFlippedL(2, 41, 3, 3));
-        barriers.add(BarrierFactory.generateRightFlippedL(2, 44, 3, 3));
-        barriers.add(BarrierFactory.generateRightLBlock(7, 46, 2, 4));
-        barriers.add(BarrierFactory.generateLeftLBlock(9, 46, 3, 4));
-        barriers.add(BarrierFactory.generateRectangleBlock(14, 51, 1, 5));
-        barriers.add(BarrierFactory.generateLeftFlippedL(15, 52, 4, 4));
-        //1, 0
-        barriers.add(BarrierFactory.generateLeftFlippedL(21, 3, 3, 2));
-        barriers.add(BarrierFactory.generateLeftLBlock(23, 3, 3, 2));
-        barriers.add(BarrierFactory.generateRightFlippedL(35, 12, 3, 5));
-        barriers.add(BarrierFactory.generateRectangleBlock(36, 16, 2, 1));
-        //1, 1
-        barriers.add(BarrierFactory.generateRectangleBlock(22, 22, 6, 1));
-        barriers.add(BarrierFactory.generateRectangleBlock(26, 26, 7, 1));
-        barriers.add(BarrierFactory.generateRectangleBlock(28, 30, 8, 1));
-        barriers.add(BarrierFactory.generateRectangleBlock(31, 34, 8, 1));
-        barriers.add(BarrierFactory.generateRightLBlock(22, 33, 5, 6));
-        //1, 2
-        barriers.add(BarrierFactory.generateRightFlippedL(21, 46, 6, 5));
-        barriers.add(BarrierFactory.generateRectangleBlock(22, 50, 17, 1));
-        barriers.add(BarrierFactory.generateLeftFlippedL(31, 46, 8, 4));
-        barriers.add(BarrierFactory.generateRightLBlock(26, 54, 2, 4));
-        barriers.add(BarrierFactory.generateLeftLBlock(31, 54, 2, 4));
-        //2, 0
-        barriers.add(BarrierFactory.generateRectangleBlock(43, 5, 12, 2));
-        barriers.add(BarrierFactory.generateRightLBlock(48, 7, 7, 6));
-        barriers.add(BarrierFactory.generateRectangleBlock(43, 12, 5, 1));
-        //2, 1
-        barriers.add(BarrierFactory.generateRightLBlock(42, 21, 4, 5));
-        barriers.add(BarrierFactory.generateLeftFlippedL(46, 22, 4, 7));
-        barriers.add(BarrierFactory.generateRectangleBlock(53, 21, 6, 2));
-        barriers.add(BarrierFactory.generateRightFlippedL(43, 28, 3, 6));
-        barriers.add(BarrierFactory.generateLeftLBlock(47, 28, 6, 6));
-        barriers.add(BarrierFactory.generateLeftLBlock(52, 29, 6, 9));
-        //2, 2
-        barriers.add(BarrierFactory.generateRightLBlock(46, 43, 2, 3));
-        barriers.add(BarrierFactory.generateRectangleBlock(54, 48, 2, 2));
-        barriers.add(BarrierFactory.generateRightLBlock(42, 54, 8, 3));
-        barriers.add(BarrierFactory.generateRectangleBlock(50, 55, 2, 2));
-        barriers.add(BarrierFactory.generateRectangleBlock(52, 56, 7, 1));
-        barriers.add(BarrierFactory.generateRectangleBlock(53, 54, 1, 2));
+        int bplace = 0;
+        Polygon temp;
+        int choice, x, y, w, h;
+        placebarriers: while (bplace < 80) {
+            x = r.nextInt(GRID_SIZE);
+            y = r.nextInt(GRID_SIZE);
+            w = r.nextInt(10);
+            h = r.nextInt(10);
+            choice = (int)(5*Math.random());
+            switch (choice) {
+                case 0: temp = BarrierFactory.generateLeftFlippedL(x, y, w, h); break;
+                case 1: temp = BarrierFactory.generateLeftLBlock(x, y, w, h); break;
+                case 2: temp = BarrierFactory.generateRectangleBlock(x, y, w, h); break;
+                case 3: temp = BarrierFactory.generateRightFlippedL(x, y, w, h); break;
+                case 4: temp = BarrierFactory.generateRightLBlock(x, y, w, h); break;
+                default: temp = BarrierFactory.generateRectangleBlock(x, y, w, h);
+            }
+            
+            for (Polygon p : barriers) {
+                if (p.intersects(temp.getBounds2D()))
+                    continue placebarriers;
+            }
+            
+            barriers.add(temp);
+            bplace++;
+        }
+//        //0, 0
+//        barriers.add(BarrierFactory.generateRightFlippedL(5, 4, 3, 5));
+//        barriers.add(BarrierFactory.generateLeftLBlock(9, 4, 3, 5));
+//        barriers.add(BarrierFactory.generateRectangleBlock(14, 10, 8, 2));
+//        barriers.add(BarrierFactory.generateRightLBlock(3, 16, 5, 3));
+//        //0, 1
+//        barriers.add(BarrierFactory.generateRightFlippedL(5, 23, 4, 3));
+//        barriers.add(BarrierFactory.generateRightFlippedL(5, 26, 4, 5));
+//        barriers.add(BarrierFactory.generateLeftFlippedL(12, 30, 4, 4));
+//        barriers.add(BarrierFactory.generateLeftFlippedL(12, 34, 4, 3));
+//        //0, 2
+//        barriers.add(BarrierFactory.generateRightFlippedL(2, 41, 3, 3));
+//        barriers.add(BarrierFactory.generateRightFlippedL(2, 44, 3, 3));
+//        barriers.add(BarrierFactory.generateRightLBlock(7, 46, 2, 4));
+//        barriers.add(BarrierFactory.generateLeftLBlock(9, 46, 3, 4));
+//        barriers.add(BarrierFactory.generateRectangleBlock(14, 51, 1, 5));
+//        barriers.add(BarrierFactory.generateLeftFlippedL(15, 52, 4, 4));
+//        //1, 0
+//        barriers.add(BarrierFactory.generateLeftFlippedL(21, 3, 3, 2));
+//        barriers.add(BarrierFactory.generateLeftLBlock(23, 3, 3, 2));
+//        barriers.add(BarrierFactory.generateRightFlippedL(35, 12, 3, 5));
+//        barriers.add(BarrierFactory.generateRectangleBlock(36, 16, 2, 1));
+//        //1, 1
+//        barriers.add(BarrierFactory.generateRectangleBlock(22, 22, 6, 1));
+//        barriers.add(BarrierFactory.generateRectangleBlock(26, 26, 7, 1));
+//        barriers.add(BarrierFactory.generateRectangleBlock(28, 30, 8, 1));
+//        barriers.add(BarrierFactory.generateRectangleBlock(31, 34, 8, 1));
+//        barriers.add(BarrierFactory.generateRightLBlock(22, 33, 5, 6));
+//        //1, 2
+//        barriers.add(BarrierFactory.generateRightFlippedL(21, 46, 6, 5));
+//        barriers.add(BarrierFactory.generateRectangleBlock(22, 50, 17, 1));
+//        barriers.add(BarrierFactory.generateLeftFlippedL(31, 46, 8, 4));
+//        barriers.add(BarrierFactory.generateRightLBlock(26, 54, 2, 4));
+//        barriers.add(BarrierFactory.generateLeftLBlock(31, 54, 2, 4));
+//        //2, 0
+//        barriers.add(BarrierFactory.generateRectangleBlock(43, 5, 12, 2));
+//        barriers.add(BarrierFactory.generateRightLBlock(48, 7, 7, 6));
+//        barriers.add(BarrierFactory.generateRectangleBlock(43, 12, 5, 1));
+//        //2, 1
+//        barriers.add(BarrierFactory.generateRightLBlock(42, 21, 4, 5));
+//        barriers.add(BarrierFactory.generateLeftFlippedL(46, 22, 4, 7));
+//        barriers.add(BarrierFactory.generateRectangleBlock(53, 21, 6, 2));
+//        barriers.add(BarrierFactory.generateRightFlippedL(43, 28, 3, 6));
+//        barriers.add(BarrierFactory.generateLeftLBlock(47, 28, 6, 6));
+//        barriers.add(BarrierFactory.generateLeftLBlock(52, 29, 6, 9));
+//        //2, 2
+//        barriers.add(BarrierFactory.generateRightLBlock(46, 43, 2, 3));
+//        barriers.add(BarrierFactory.generateRectangleBlock(54, 48, 2, 2));
+//        barriers.add(BarrierFactory.generateRightLBlock(42, 54, 8, 3));
+//        barriers.add(BarrierFactory.generateRectangleBlock(50, 55, 2, 2));
+//        barriers.add(BarrierFactory.generateRectangleBlock(52, 56, 7, 1));
+//        barriers.add(BarrierFactory.generateRectangleBlock(53, 54, 1, 2));
         
         map = new boolean[GRID_SIZE][GRID_SIZE];
         for (int i = 0; i < map.length; i++) {
@@ -138,6 +167,8 @@ public class ScrollingMap extends Applet implements Runnable {
         }
         bg.dispose();
         
+        minimap = bgimage.getScaledInstance(75, 75, Image.SCALE_SMOOTH);
+        
         userbullets = new ArrayList<Bullet>();
         cpubullets = new ArrayList<Bullet>();
         
@@ -145,9 +176,9 @@ public class ScrollingMap extends Applet implements Runnable {
         cpuPlayers = new ArrayList<ComputerPlayer>();
         frozenCPU = new ArrayList<ComputerPlayer>();
         
-        int numcpu = 0;
+        int placecounter = 0;
         int placex, placey;
-        placecpu: while (numcpu < 15) {
+        placecpu: while (placecounter < 20) {
             placex = (int) (Math.random() * GRID_SIZE);
             placey = (int) (Math.random() * GRID_SIZE);
             
@@ -155,10 +186,35 @@ public class ScrollingMap extends Applet implements Runnable {
                 continue placecpu;
             
             frozenCPU.add(new ComputerPlayer(placex*20, placey*20));
-            numcpu++;
+            placecounter++;
         }
         
-        human = new Player(600, 640);
+        //Generate powerups
+        powerups = new ArrayList<Powerup>();
+        placecounter = 0;
+        placepowerups: while (placecounter < 10) {
+            placex = (int) (Math.random() * GRID_SIZE);
+            placey = (int) (Math.random() * GRID_SIZE);
+            
+            if (map[placex][placey])
+                continue placepowerups;
+            
+            choice = (int)(2*Math.random());
+            if (choice == 0)
+                powerups.add(new ReloadPowerup(placex*20, placey*20));
+            else
+                powerups.add(new HealthPowerup(placex*20, placey*20));
+            placecounter++;
+        }
+        
+        starthuman: while(true) {
+            human = new Player(r.nextInt(60)*20, r.nextInt(60)*20);
+            for (Polygon p : barriers) {
+                if (p.intersects(human.getBounds()))
+                    continue starthuman;
+            }
+            break;
+        }
         camx = human.getX() - 180;
         camy = human.getY() - 180;
     }
@@ -182,6 +238,8 @@ public class ScrollingMap extends Applet implements Runnable {
         boolean reload = false;
         gameloop: while(stopFlag) {
             long dt = System.currentTimeMillis() - loopController;
+            if (dt < 4)
+                continue gameloop;
             loopController = System.currentTimeMillis();
             
             long bdt = System.currentTimeMillis() - bulletDelay;
@@ -225,7 +283,7 @@ public class ScrollingMap extends Applet implements Runnable {
                 cp.setDirection(cdir);
             }
             
-            int umove = (int) (dt / 2);
+            int umove = (int) (dt / 3);
             if (umove == 0) umove = (int)(Math.random() * 2);
             
             if (commands[KeyEvent.VK_A] || commands[KeyEvent.VK_LEFT]) {
@@ -284,7 +342,7 @@ public class ScrollingMap extends Applet implements Runnable {
             //Start cpu movement logic
             int dx, dy;
             boolean inters = false;
-            int cmove = (int)(dt / 4);
+            int cmove = (int)(dt / 5);
             if (cmove == 0) cmove = (int)(Math.random() * 2);
             
             cpumovement: for (ComputerPlayer cp : cpuPlayers) {
@@ -368,6 +426,22 @@ public class ScrollingMap extends Applet implements Runnable {
                 for (ComputerPlayer cp : cpuPlayers) {
                     if (Math.random() < .5)
                         cpubullets.add(new Bullet(cp.getX() + 5-camx, cp.getY() + 5-camy, human.getX()-camx, human.getY()-camy, false));
+                }
+            }
+            
+            //Acquiring powerups
+            for (int i = powerups.size() - 1; i >= 0; i--) {
+                Powerup pu = powerups.get(i);
+                if (human.getBounds().intersects(pu.getBounds())) {
+                    switch (pu.getType()) {
+                        case AMMO:
+                            ammo += PowerupType.AMMO.getData();
+                            break;
+                        case HEALTH:
+                            human.heal(PowerupType.HEALTH.getData());
+                            break;
+                    }
+                    powerups.remove(i);
                 }
             }
             
@@ -472,7 +546,17 @@ public class ScrollingMap extends Applet implements Runnable {
             for (ComputerPlayer cp : cpuPlayers) {  
                 cp.draw(ogr, cp.getX() - camx, cp.getY() - camy);
             }
-            int totalbars = 1 + cpuPlayers.size();  //drawing health bars
+            if (bdt > 50) { //animate powerups
+                for (Powerup p : powerups) {
+                    if ((p.getX() >= camx && p.getX() <= camx+400) && (p.getY() >= camy && p.getY() <= camy+400))
+                        p.mutate(15);
+                }
+            }
+            for (Powerup p : powerups) {    //draw powerups
+                if ((p.getX() >= camx && p.getX() <= camx+400) && (p.getY() >= camy && p.getY() <= camy+400))
+                    p.drawWithShift(ogr, camx, camy);
+            }
+            int totalbars = 1 + cpuPlayers.size();  //draw health bars
             ogr.setColor(Color.green);
             ogr.fillRect(400 - 20*totalbars, 10, 10, human.getHealth() / 2);
             ogr.setColor(Color.yellow);
@@ -487,6 +571,32 @@ public class ScrollingMap extends Applet implements Runnable {
                 b.draw(ogr);
             for (Bullet b : cpubullets)
                 b.draw(ogr);
+            double xrat = (double) camx / 1200.0;
+            double yrat = (double) camy / 1200.0;
+            int xtop = (int)(xrat*75);
+            int ytop = (int)(yrat*75);
+            ogr.drawImage(minimap, 3, 3, null);
+            ogr.setColor(new Color((float)0, (float)0, (float)1.0, (float).2));
+            ogr.fillRect(3+xtop, 3+ytop, 25, 25);
+            ogr.setColor(Color.red);
+            for (ComputerPlayer cp : cpuPlayers) {
+                xrat = (double)cp.getX() / 1200.0;
+                yrat = (double)cp.getY() / 1200.0;
+                xtop = (int)(xrat*75);
+                ytop = (int)(yrat*75);
+
+                ogr.fillRect(xtop, ytop, 2, 2);
+                
+            }
+            for (ComputerPlayer cp : frozenCPU) {
+                xrat = (double)cp.getX() / 1200.0;
+                yrat = (double)cp.getY() / 1200.0;
+                xtop = (int)(xrat*75);
+                ytop = (int)(yrat*75);
+
+                ogr.fillRect(xtop, ytop, 2, 2);
+                
+            }
             ogr.dispose();
             
             //flip the buffer

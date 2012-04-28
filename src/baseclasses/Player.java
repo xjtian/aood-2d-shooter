@@ -18,7 +18,7 @@ public class Player {
     protected int health;
     
     public Player(int x, int y) {
-        health = 400;
+        health = 300;
         this.x = x;
         this.y = y;
         direction = 0;
