@@ -10,7 +10,8 @@ package baseclasses;
  */
 public enum PowerupType {
     AMMO(75),
-    HEALTH(100);
+    HEALTH(150),
+    DAMAGE(10);
     
     private final int data;
     PowerupType(int d) {
