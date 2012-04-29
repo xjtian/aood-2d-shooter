@@ -146,7 +146,7 @@ public class MainApplet extends Applet implements Runnable {
         
         int placecounter = 0;
         int placex, placey;
-        placecpu: while (placecounter < 15) {
+        placecpu: while (placecounter < 10+2*level) {
             placex = (int) (Math.random() * GRID_SIZE);
             placey = (int) (Math.random() * GRID_SIZE);
             
@@ -160,7 +160,7 @@ public class MainApplet extends Applet implements Runnable {
         //Generate powerups
         powerups.clear();
         placecounter = 0;
-        placepowerups: while (placecounter < 10) {
+        placepowerups: while (placecounter < 3*level) {
             placex = (int) (Math.random() * GRID_SIZE);
             placey = (int) (Math.random() * GRID_SIZE);
             
@@ -434,13 +434,13 @@ public class MainApplet extends Applet implements Runnable {
                             human.heal(PowerupType.HEALTH.getData());
                             break;
                         case DAMAGE:
-                            bulletdamage += 5;
+                            bulletdamage += 10;
                             break;
                     }
                     powerups.remove(i);
                     int placecounter = 0;
                     int placex, placey;
-                    placecpu: while (placecounter < 3) {    //spawn in more enemies
+                    placecpu: while (placecounter < level) {    //spawn in more enemies
                         placex = (int) (Math.random() * GRID_SIZE);
                         placey = (int) (Math.random() * GRID_SIZE);
 
@@ -510,7 +510,7 @@ public class MainApplet extends Applet implements Runnable {
                 
                 if (cpubullets.get(i).getBounds().intersects(human.getBounds())) {
                     cpubullets.remove(i);
-                    human.damage(1);
+                    human.damage((level/2) + 1);
                 }
             }
             
