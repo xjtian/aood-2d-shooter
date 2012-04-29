@@ -69,7 +69,7 @@ public class HealthPowerup extends RotatingPowerup {
 
     @Override
     public void drawWithShift(Graphics2D g, int x, int y) {
-        g.drawImage(sprites.get(super.getDirection()), super.getX() - x, super.getY() - y, null);
+        g.drawImage(sprites.get(super.getDirection()), super.getX() + x, super.getY() + y, null);
     }
     
 }

@@ -17,6 +17,11 @@ public class Player {
     protected int y;
     protected int health;
     
+    public Player() {
+        health = 300;
+        direction = 0;
+    }
+    
     public Player(int x, int y) {
         health = 300;
         this.x = x;
@@ -27,6 +32,11 @@ public class Player {
     public void move(int dx, int dy) {
         x += dx;
         y += dy;
+    }
+    
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
     
     public int getX() {

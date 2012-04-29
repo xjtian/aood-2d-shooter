@@ -13,3 +13,56 @@ Human sprite:
 		12px space between top/bottom of body and bound
 		4px space between left/right of body and bound
 	Center of the body is in the exact center of bounding rectangle
+
+//        //0, 0
+//        barriers.add(BarrierFactory.generateRightFlippedL(5, 4, 3, 5));
+//        barriers.add(BarrierFactory.generateLeftLBlock(9, 4, 3, 5));
+//        barriers.add(BarrierFactory.generateRectangleBlock(14, 10, 8, 2));
+//        barriers.add(BarrierFactory.generateRightLBlock(3, 16, 5, 3));
+//        //0, 1
+//        barriers.add(BarrierFactory.generateRightFlippedL(5, 23, 4, 3));
+//        barriers.add(BarrierFactory.generateRightFlippedL(5, 26, 4, 5));
+//        barriers.add(BarrierFactory.generateLeftFlippedL(12, 30, 4, 4));
+//        barriers.add(BarrierFactory.generateLeftFlippedL(12, 34, 4, 3));
+//        //0, 2
+//        barriers.add(BarrierFactory.generateRightFlippedL(2, 41, 3, 3));
+//        barriers.add(BarrierFactory.generateRightFlippedL(2, 44, 3, 3));
+//        barriers.add(BarrierFactory.generateRightLBlock(7, 46, 2, 4));
+//        barriers.add(BarrierFactory.generateLeftLBlock(9, 46, 3, 4));
+//        barriers.add(BarrierFactory.generateRectangleBlock(14, 51, 1, 5));
+//        barriers.add(BarrierFactory.generateLeftFlippedL(15, 52, 4, 4));
+//        //1, 0
+//        barriers.add(BarrierFactory.generateLeftFlippedL(21, 3, 3, 2));
+//        barriers.add(BarrierFactory.generateLeftLBlock(23, 3, 3, 2));
+//        barriers.add(BarrierFactory.generateRightFlippedL(35, 12, 3, 5));
+//        barriers.add(BarrierFactory.generateRectangleBlock(36, 16, 2, 1));
+//        //1, 1
+//        barriers.add(BarrierFactory.generateRectangleBlock(22, 22, 6, 1));
+//        barriers.add(BarrierFactory.generateRectangleBlock(26, 26, 7, 1));
+//        barriers.add(BarrierFactory.generateRectangleBlock(28, 30, 8, 1));
+//        barriers.add(BarrierFactory.generateRectangleBlock(31, 34, 8, 1));
+//        barriers.add(BarrierFactory.generateRightLBlock(22, 33, 5, 6));
+//        //1, 2
+//        barriers.add(BarrierFactory.generateRightFlippedL(21, 46, 6, 5));
+//        barriers.add(BarrierFactory.generateRectangleBlock(22, 50, 17, 1));
+//        barriers.add(BarrierFactory.generateLeftFlippedL(31, 46, 8, 4));
+//        barriers.add(BarrierFactory.generateRightLBlock(26, 54, 2, 4));
+//        barriers.add(BarrierFactory.generateLeftLBlock(31, 54, 2, 4));
+//        //2, 0
+//        barriers.add(BarrierFactory.generateRectangleBlock(43, 5, 12, 2));
+//        barriers.add(BarrierFactory.generateRightLBlock(48, 7, 7, 6));
+//        barriers.add(BarrierFactory.generateRectangleBlock(43, 12, 5, 1));
+//        //2, 1
+//        barriers.add(BarrierFactory.generateRightLBlock(42, 21, 4, 5));
+//        barriers.add(BarrierFactory.generateLeftFlippedL(46, 22, 4, 7));
+//        barriers.add(BarrierFactory.generateRectangleBlock(53, 21, 6, 2));
+//        barriers.add(BarrierFactory.generateRightFlippedL(43, 28, 3, 6));
+//        barriers.add(BarrierFactory.generateLeftLBlock(47, 28, 6, 6));
+//        barriers.add(BarrierFactory.generateLeftLBlock(52, 29, 6, 9));
+//        //2, 2
+//        barriers.add(BarrierFactory.generateRightLBlock(46, 43, 2, 3));
+//        barriers.add(BarrierFactory.generateRectangleBlock(54, 48, 2, 2));
+//        barriers.add(BarrierFactory.generateRightLBlock(42, 54, 8, 3));
+//        barriers.add(BarrierFactory.generateRectangleBlock(50, 55, 2, 2));
+//        barriers.add(BarrierFactory.generateRectangleBlock(52, 56, 7, 1));
+//        barriers.add(BarrierFactory.generateRectangleBlock(53, 54, 1, 2));

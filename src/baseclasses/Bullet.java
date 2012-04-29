@@ -26,7 +26,7 @@ public class Bullet {
     private boolean negativex;
     private boolean negativey;
     
-    private final double VEL = 4.0;
+    private final double VEL = 5.0;
     
     private static BufferedImage hsprite;
     private static BufferedImage csprite;
@@ -49,6 +49,8 @@ public class Bullet {
         this.y = y;
         if (mx - x == 0)
             x--;
+        if (my - y == 0)
+            this.y++;
         this.slope = Math.abs(((double) (my - y) / (double) (mx - x)));
         negativex = (mx - x) < 0;
         negativey = (my - y) < 0;
@@ -68,6 +70,20 @@ public class Bullet {
         y = (negativey) ? y - (int)dy : y + (int)dy;
     }
     
+    public void move(long dt) {
+        double t = (double)dt;
+        double dx;
+        if (t < VEL)
+            dx = Math.sqrt((VEL*VEL) / (1 + (slope*slope)));
+        else
+            dx = Math.sqrt((t*t) / (1 + (slope*slope)));
+        double dy = slope * dx;
+        
+        dy = dy + 5*Math.random() - 2.5;
+        x = (negativex) ? x - (int)dx : x + (int)dx;
+        y = (negativey) ? y - (int)dy : y + (int)dy;
+    }
+    
     /**
      * Draw a bullet in the specified graphics context.
      * 
@@ -78,6 +94,13 @@ public class Bullet {
             g.drawImage(hsprite, x, y, null);
         else
             g.drawImage(csprite, x, y, null);
+    }
+    
+    public void drawWithShift(Graphics g, int dx, int dy) {
+        if (human)
+            g.drawImage(hsprite, x + dx, y + dy, null);
+        else
+            g.drawImage(csprite, x + dx, y + dy, null);
     }
     
     /**

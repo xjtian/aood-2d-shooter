@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package prototype;
+package main;
 
 import baseclasses.*;
 import java.applet.Applet;
@@ -13,11 +13,11 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
- * Demo applet of the game with a scrolling map and camera that follows the player.
+ * Main applet.
  * 
  * @author Jacky Tian
  */
-public class ScrollingMap extends Applet implements Runnable {
+public class MainApplet extends Applet implements Runnable {
     private boolean[] commands = new boolean[32767];    //key and mouse commands
     
     private Player human;
