@@ -18,6 +18,11 @@ public class ComputerPlayer extends Player {
     }
     
     @Override
+    public Bullet shoot(int mx, int my) {
+        return new Bullet(x+5, y+5, mx, my, false);
+    }
+    
+    @Override
     public java.awt.Rectangle getBounds() {
         return new java.awt.Rectangle(super.x, super.y, 20, 20);
     }

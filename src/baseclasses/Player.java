@@ -39,6 +39,10 @@ public class Player {
         this.y = y;
     }
     
+    public Bullet shoot(int mx, int my) {
+        return new Bullet(x+15, y+15, mx, my, true);
+    }
+    
     public int getX() {
         return x;
     }

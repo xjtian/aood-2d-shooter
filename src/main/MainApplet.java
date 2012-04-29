@@ -146,7 +146,7 @@ public class MainApplet extends Applet implements Runnable {
         
         int placecounter = 0;
         int placex, placey;
-        placecpu: while (placecounter < 10+2*level) {
+        placecpu: while (placecounter < 10+3*level) {
             placex = (int) (Math.random() * GRID_SIZE);
             placey = (int) (Math.random() * GRID_SIZE);
             
@@ -160,7 +160,7 @@ public class MainApplet extends Applet implements Runnable {
         //Generate powerups
         powerups.clear();
         placecounter = 0;
-        placepowerups: while (placecounter < 3*level) {
+        placepowerups: while (placecounter < 2*level) {
             placex = (int) (Math.random() * GRID_SIZE);
             placey = (int) (Math.random() * GRID_SIZE);
             
@@ -200,6 +200,108 @@ public class MainApplet extends Applet implements Runnable {
         camy = human.getY() - 180;
     }
     
+    private void clickScreen() {    //@TODO: prettier waitscreen
+        boolean enterheld = commands[MouseEvent.BUTTON1];
+        boolean cont = true;
+        while (cont && stopFlag) {
+            if (enterheld) {
+                if (!commands[MouseEvent.BUTTON1])
+                    enterheld = false;
+            }
+            
+            if (!enterheld && commands[MouseEvent.BUTTON1])
+                cont = false;
+            
+            ogr = buffer.createGraphics();
+            ogr.setColor(Color.black);
+            ogr.fillRect(0, 0, 400, 400);
+            ogr.setColor(Color.white);
+            ogr.setFont(new Font("Pause", Font.BOLD, 20));
+            ogr.drawString("Level " + level, 150, 150);
+            ogr.drawString("Click to Continue", 100, 200);
+            ogr.dispose();
+            this.getGraphics().drawImage(buffer, 0, 0, null);
+        }
+    }
+    
+    private void offPaint(long bdt) {
+        //Paint offscreen
+        ogr = buffer.createGraphics();
+        ogr.setColor(Color.white);
+        ogr.fillRect(0, 0, 400, 400);   //Clear offscreen image
+        ogr.drawImage(bgimage.getSubimage(camx, camy, 400, 400), 0, 0, null);   //paint map
+        human.draw(ogr, human.getX() - camx, human.getY() - camy);
+        for (ComputerPlayer cp : cpuPlayers) {  
+            cp.draw(ogr, cp.getX() - camx, cp.getY() - camy);
+        }
+        if (bdt > 50) { //animate powerups
+            for (Powerup p : powerups) {
+                if ((p.getX() >= camx && p.getX() <= camx+400) && (p.getY() >= camy && p.getY() <= camy+400))
+                    p.mutate(15);
+            }
+        }
+        for (Powerup p : powerups) {    //draw powerups
+            if ((p.getX() >= camx && p.getX() <= camx+400) && (p.getY() >= camy && p.getY() <= camy+400))
+                p.drawWithShift(ogr, -camx, -camy);
+        }
+        int totalbars = 1 + cpuPlayers.size();  //draw health bars
+        ogr.setColor(Color.green);
+        ogr.fillRect(400 - 20*totalbars, 10, 10, human.getHealth() / 2);
+        ogr.setColor(Color.yellow);
+        for (int i = 0; i < ammo; i++) {    //draw ammo bar
+            ogr.fillRect(400 - 20*totalbars - 25, 5*i, 15, 3);
+        }
+        ogr.setColor(Color.orange);
+        for (int i = 0; i < clips; i++) {
+            ogr.fillRect(400 - 20*totalbars - 40, 15*i, 10, 10);
+        }
+        ogr.setColor(Color.red);
+        for (int i = 0; i < cpuPlayers.size(); i++) {
+            ogr.fillRect(400 - 20*(totalbars - i - 1), 10, 10, cpuPlayers.get(i).getHealth() / 2);
+        }
+        for (Bullet b : userbullets)    //drawing bullets
+            b.drawWithShift(ogr, -camx, -camy);
+        for (Bullet b : cpubullets)
+            b.drawWithShift(ogr, -camx, -camy);
+        double xrat = (double) camx / 1200.0;   //draw minimap and enemy dots
+        double yrat = (double) camy / 1200.0;
+        int xtop = (int)(xrat*75);
+        int ytop = (int)(yrat*75);
+        ogr.drawImage(minimap, 3, 3, null);
+        ogr.setColor(new Color((float)0, (float)0, (float)1.0, (float).2));
+        ogr.fillRect(3+xtop, 3+ytop, 25, 25);
+        ogr.setColor(Color.red);
+        for (ComputerPlayer cp : cpuPlayers) {
+            xrat = (double)cp.getX() / 1200.0;
+            yrat = (double)cp.getY() / 1200.0;
+            xtop = (int)(xrat*75);
+            ytop = (int)(yrat*75);
+
+            ogr.fillRect(xtop-1, ytop-1, 3, 3);
+        }
+        for (ComputerPlayer cp : frozenCPU) {
+            xrat = (double)cp.getX() / 1200.0;
+            yrat = (double)cp.getY() / 1200.0;
+            xtop = (int)(xrat*75);
+            ytop = (int)(yrat*75);
+
+            ogr.fillRect(xtop, ytop, 2, 2);
+
+        }
+        ogr.setColor(Color.yellow);
+        ogr.setFont(new Font("Score", Font.BOLD, 20));
+        ogr.drawString("" + score, 3, 398);
+        if (ammo <= CLIP_SIZE / 4 && clips > 0) {
+            ogr.setColor(Color.gray);
+            ogr.drawString("R to Reload", 150, 225);
+        }
+        ogr.dispose();
+
+        //flip the buffer
+        this.getGraphics().drawImage(buffer, 0, 0, null);
+        frames++;
+    }
+    
     @Override
     public void start() {
         enableEvents(AWTEvent.KEY_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK);
@@ -213,6 +315,7 @@ public class MainApplet extends Applet implements Runnable {
 
     @Override
     public void run() {
+        clickScreen();
         long loopController = System.currentTimeMillis();
         long bulletDelay = System.currentTimeMillis();
         long reloadDelay = System.currentTimeMillis();
@@ -405,19 +508,19 @@ public class MainApplet extends Applet implements Runnable {
             //Shooting bullets
             if (bdt > 50) {
                 if (commands[MouseEvent.BUTTON1] && ammo > 0 && !reload) {
-                    userbullets.add(new Bullet(human.getX()+15, human.getY()+15, mx+camx, my+camy, true));
+                    userbullets.add(human.shoot(mx+camx, my+camy));
                     ammo--;
                 } else {    //empty ammo
                     if (commands[MouseEvent.BUTTON1] && !pistolShot) {
                         pistolShot = true;
-                        userbullets.add(new Bullet(human.getX()+15, human.getY()+15, mx+camx, my+camy, true));
+                        userbullets.add(human.shoot(mx+camx, my+camy));
                     } else if (! commands[MouseEvent.BUTTON1]) {
                         pistolShot = false;
                     }
                 }
                 for (ComputerPlayer cp : cpuPlayers) {
-                    if (Math.random() < .5)
-                        cpubullets.add(new Bullet(cp.getX() + 5, cp.getY() + 5, human.getX(), human.getY(), false));
+                    if (Math.random() < .4 + level*.1)
+                        cpubullets.add(cp.shoot(human.getX(), human.getY()));
                 }
             }
             
@@ -548,81 +651,7 @@ public class MainApplet extends Applet implements Runnable {
                     frozenCPU.add(cpuPlayers.remove(i));
             }
                 
-            //Paint offscreen
-            ogr = buffer.createGraphics();
-            ogr.setColor(Color.white);
-            ogr.fillRect(0, 0, 400, 400);   //Clear offscreen image
-            ogr.drawImage(bgimage.getSubimage(camx, camy, 400, 400), 0, 0, null);   //paint map
-            human.draw(ogr, human.getX() - camx, human.getY() - camy);
-            for (ComputerPlayer cp : cpuPlayers) {  
-                cp.draw(ogr, cp.getX() - camx, cp.getY() - camy);
-            }
-            if (bdt > 50) { //animate powerups
-                for (Powerup p : powerups) {
-                    if ((p.getX() >= camx && p.getX() <= camx+400) && (p.getY() >= camy && p.getY() <= camy+400))
-                        p.mutate(15);
-                }
-            }
-            for (Powerup p : powerups) {    //draw powerups
-                if ((p.getX() >= camx && p.getX() <= camx+400) && (p.getY() >= camy && p.getY() <= camy+400))
-                    p.drawWithShift(ogr, -camx, -camy);
-            }
-            int totalbars = 1 + cpuPlayers.size();  //draw health bars
-            ogr.setColor(Color.green);
-            ogr.fillRect(400 - 20*totalbars, 10, 10, human.getHealth() / 2);
-            ogr.setColor(Color.yellow);
-            for (int i = 0; i < ammo; i++) {    //draw ammo bar
-                ogr.fillRect(400 - 20*totalbars - 25, 5*i, 15, 3);
-            }
-            ogr.setColor(Color.orange);
-            for (int i = 0; i < clips; i++) {
-                ogr.fillRect(400 - 20*totalbars - 40, 15*i, 10, 10);
-            }
-            ogr.setColor(Color.red);
-            for (int i = 0; i < cpuPlayers.size(); i++) {
-                ogr.fillRect(400 - 20*(totalbars - i - 1), 10, 10, cpuPlayers.get(i).getHealth() / 2);
-            }
-            for (Bullet b : userbullets)    //drawing bullets
-                b.drawWithShift(ogr, -camx, -camy);
-            for (Bullet b : cpubullets)
-                b.drawWithShift(ogr, -camx, -camy);
-            double xrat = (double) camx / 1200.0;   //draw minimap and enemy dots
-            double yrat = (double) camy / 1200.0;
-            int xtop = (int)(xrat*75);
-            int ytop = (int)(yrat*75);
-            ogr.drawImage(minimap, 3, 3, null);
-            ogr.setColor(new Color((float)0, (float)0, (float)1.0, (float).2));
-            ogr.fillRect(3+xtop, 3+ytop, 25, 25);
-            ogr.setColor(Color.red);
-            for (ComputerPlayer cp : cpuPlayers) {
-                xrat = (double)cp.getX() / 1200.0;
-                yrat = (double)cp.getY() / 1200.0;
-                xtop = (int)(xrat*75);
-                ytop = (int)(yrat*75);
-
-                ogr.fillRect(xtop-1, ytop-1, 3, 3);
-            }
-            for (ComputerPlayer cp : frozenCPU) {
-                xrat = (double)cp.getX() / 1200.0;
-                yrat = (double)cp.getY() / 1200.0;
-                xtop = (int)(xrat*75);
-                ytop = (int)(yrat*75);
-
-                ogr.fillRect(xtop, ytop, 2, 2);
-                
-            }
-            ogr.setColor(Color.yellow);
-            ogr.setFont(new Font("Score", Font.BOLD, 20));
-            ogr.drawString("" + score, 3, 398);
-            if (ammo <= CLIP_SIZE / 4 && clips > 0) {
-                ogr.setColor(Color.gray);
-                ogr.drawString("R to Reload", 150, 225);
-            }
-            ogr.dispose();
-            
-            //flip the buffer
-            this.getGraphics().drawImage(buffer, 0, 0, null);
-            frames++;
+            offPaint(bdt);  //Paint!
             
             if (human.getHealth() <= 0) {
                 System.out.println("You lost"); //@TODO: something prettier
@@ -638,6 +667,9 @@ public class MainApplet extends Applet implements Runnable {
                 level++;
                 score += 100;
                 generateGame(true);
+                clickScreen();
+                time = System.currentTimeMillis();
+                frames = 0;
             }
             
             boolean newlevel = false;
@@ -691,10 +723,15 @@ public class MainApplet extends Applet implements Runnable {
                         paused = false;
                         stopFlag = false;
                         System.exit(0);
+                        //@TODO: more graceful exit
                     }
                     
-                    if (newlevel)
+                    if (newlevel) {
                         generateGame(false);
+                        score -= 200;
+                        clickScreen();
+                        time = System.currentTimeMillis();
+                    }
                     
                     getGraphics().drawImage(pbuffer, 0, 0, null);
                     ogr.dispose();
