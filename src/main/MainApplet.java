@@ -81,10 +81,10 @@ public class MainApplet extends Applet implements Runnable {
         powerups = new ArrayList<Powerup>();
         
         human = new Player();
-        generateGame();
+        generateGame(true);
     }
     
-    private void generateGame() {
+    private void generateGame(boolean damage) {
         //instantiate map barriers
         barriers.clear();
         int bplace = 0;
@@ -146,7 +146,7 @@ public class MainApplet extends Applet implements Runnable {
         
         int placecounter = 0;
         int placex, placey;
-        placecpu: while (placecounter < 20) {
+        placecpu: while (placecounter < 15) {
             placex = (int) (Math.random() * GRID_SIZE);
             placey = (int) (Math.random() * GRID_SIZE);
             
@@ -175,7 +175,7 @@ public class MainApplet extends Applet implements Runnable {
             placecounter++;
         }
         
-        placedamagepowerup: while(true) {
+        placedamagepowerup: while(damage) {
             placex = (int) (Math.random() * GRID_SIZE);
             placey = (int) (Math.random() * GRID_SIZE);
             
@@ -636,8 +636,8 @@ public class MainApplet extends Applet implements Runnable {
             if (cpuPlayers.isEmpty() && frozenCPU.isEmpty()) {
                 System.out.println("New level");
                 level++;
-                score += 50;
-                generateGame();
+                score += 100;
+                generateGame(true);
             }
             
             boolean newlevel = false;
@@ -684,9 +684,17 @@ public class MainApplet extends Applet implements Runnable {
                     
                     if (commands[KeyEvent.VK_P])
                         paused = false;
+                    else if (commands[KeyEvent.VK_N]) {
+                        paused = false;
+                        newlevel = true;
+                    } else if (commands[KeyEvent.VK_Q]) {
+                        paused = false;
+                        stopFlag = false;
+                        System.exit(0);
+                    }
                     
                     if (newlevel)
-                        generateGame();
+                        generateGame(false);
                     
                     getGraphics().drawImage(pbuffer, 0, 0, null);
                     ogr.dispose();
