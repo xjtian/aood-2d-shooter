@@ -90,7 +90,7 @@ public class MainApplet extends Applet implements Runnable {
         int bplace = 0;
         Polygon temp;
         int choice, x, y, w, h;
-        placebarriers: while (bplace < 80) {
+        placebarriers: while (bplace < 70) {
             x = (int)(GRID_SIZE*Math.random());
             y = (int)(GRID_SIZE*Math.random());
             w = (int)(9*Math.random())+1;
@@ -105,8 +105,13 @@ public class MainApplet extends Applet implements Runnable {
                 default: temp = BarrierFactory.generateRectangleBlock(x, y, w, h);
             }
             
+            Rectangle boundsbig = temp.getBounds();
+            boundsbig.grow(2, 2);
+            Rectangle intboundsbig;
             for (Polygon p : barriers) {
-                if (p.intersects(temp.getBounds2D()))
+                intboundsbig = p.getBounds();
+                intboundsbig.grow(2, 2);
+                if (boundsbig.intersects(intboundsbig))
                     continue placebarriers;
             }
             
@@ -370,7 +375,7 @@ public class MainApplet extends Applet implements Runnable {
                 
                 cp.setDirection(cdir);
             }
-            
+            //@TODO: backwards movement logic for collision detections
             int umove = (int) (dt / 3);
             if (umove == 0) umove = (int)(Math.random() * 2);
             
@@ -428,6 +433,7 @@ public class MainApplet extends Applet implements Runnable {
             }
             
             //Start cpu movement logic
+            //@TODO: same corrections to cpu collision detection
             int dx, dy;
             boolean inters = false;
             int cmove = (int)(dt / 5);
