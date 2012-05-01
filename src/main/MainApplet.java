@@ -165,18 +165,26 @@ public class MainApplet extends Applet implements Runnable {
         //Generate powerups
         powerups.clear();
         placecounter = 0;
-        placepowerups: while (placecounter < 2*level) {
+        placereloads: while (placecounter < level) {
             placex = (int) (Math.random() * GRID_SIZE);
             placey = (int) (Math.random() * GRID_SIZE);
             
             if (map[placex][placey])
-                continue placepowerups;
+                continue placereloads;
             
-            choice = (int)(2*Math.random());
-            if (choice == 0)
-                powerups.add(new ReloadPowerup(placex*20, placey*20));
-            else
-                powerups.add(new HealthPowerup(placex*20, placey*20));
+            powerups.add(new ReloadPowerup(placex*20, placey*20));
+            placecounter++;
+        }
+        
+        placecounter = 0;
+        placehealths: while (placecounter < level) {
+            placex = (int) (Math.random() * GRID_SIZE);
+            placey = (int) (Math.random() * GRID_SIZE);
+            
+            if (map[placex][placey])
+                continue placehealths;
+            
+            powerups.add(new HealthPowerup(placex*20, placey*20));
             placecounter++;
         }
         
@@ -375,7 +383,7 @@ public class MainApplet extends Applet implements Runnable {
                 
                 cp.setDirection(cdir);
             }
-            //@TODO: backwards movement logic for collision detections
+            //@TODO: check left-sided user collision with vertical L leg
             int umove = (int) (dt / 3);
             if (umove == 0) umove = (int)(Math.random() * 2);
             Rectangle hbound;
@@ -389,7 +397,7 @@ public class MainApplet extends Applet implements Runnable {
                 hbound = human.getBounds();
                 for (Polygon p : barriers) {
                     if (p.intersects(hbound)) {
-                        human.move(10 - (human.getX() % 20), 0);
+                        human.move(20 - (human.getX() % 20), 0);
                         break;
                     }
                 }
@@ -402,18 +410,20 @@ public class MainApplet extends Applet implements Runnable {
                 hbound = human.getBounds();
                 for (Polygon p : barriers) {
                     if (p.intersects(hbound)) {
-                        human.move(-umove, 0);
+                        human.move(-(human.getX() % 20), 0);
                         break;
                     }
                 }
             }
             if (commands[KeyEvent.VK_W] || commands[KeyEvent.VK_UP]) {
                 human.move(0, -umove);
-                if (human.getY() < 0)
+                if (human.getY() < 0) {
                     human.move(0, umove);
+                    human.move(0, -human.getY());
+                }
                 for (Polygon p : barriers) {
                     if (p.intersects(human.getBounds())) {
-                        human.move(0, umove);
+                        human.move(0, 20 - (human.getY() % 20));
                         break;
                     }
                 }
@@ -421,10 +431,10 @@ public class MainApplet extends Applet implements Runnable {
             if (commands[KeyEvent.VK_S] || commands[KeyEvent.VK_DOWN]) {
                 human.move(0, umove);
                 if (human.getY() > DIM - 40)
-                    human.move(0, -umove);
+                    human.move(0, DIM - 40 - human.getY());
                 for (Polygon p : barriers) {
                     if (p.intersects(human.getBounds())) {
-                        human.move(0, -umove);
+                        human.move(0, -(human.getY() % 20));
                         break;
                     }
                 }
@@ -455,6 +465,7 @@ public class MainApplet extends Applet implements Runnable {
                     cp.move(-cmove, 0);
                 else
                     cp.move(cmove, 0);
+                //Collisions and bounds checks
                 if (cp.getX() < DIM-20 && cp.getX() > 0) {
                     collisions: for (Polygon p : barriers) {
                         inters = p.intersects(cp.getBounds());
@@ -468,18 +479,21 @@ public class MainApplet extends Applet implements Runnable {
                             if (inters) break cpucollide;
                         }
                     }
-                } else {
-                    if (dx < 0)
+                } else {    //Out of bounds
+                    if (dx < 0) {
                         cp.move(cmove, 0);
-                    else
-                        cp.move(-cmove, 0);
+                        cp.move(-cp.getX(), 0);
+                    }
+                    else {
+                        cp.move(DIM - 20 - cp.getX(), 0);
+                    }
                 }
                 
-                if (inters) {
+                if (inters) {//moved into barrier
                     if (dx < 0)
-                        cp.move(cmove, 0);
+                        cp.move(20 - (cp.getX() % 20), 0);
                     else
-                        cp.move(-cmove, 0);
+                        cp.move(-(cp.getX() % 20), 0);
                     inters = false;
                 }
                 //vertical movement
@@ -488,6 +502,7 @@ public class MainApplet extends Applet implements Runnable {
                     cp.move(0, -cmove);
                 else
                     cp.move(0, cmove);
+                //Collisions and bounds checks
                 if (cp.getY() < DIM-20 && cp.getY() > 0) {
                     collisions: for (Polygon p : barriers) {
                         inters = p.intersects(cp.getBounds());
@@ -502,17 +517,22 @@ public class MainApplet extends Applet implements Runnable {
                         }
                     }
                 } else {
-                    if (dy < 0)
+                    if (dy < 0) {
                         cp.move(0, cmove);
-                    else
-                        cp.move(0, -cmove);
+                        cp.move(0, -cp.getY());
+                    }
+                    else {
+                        cp.move(DIM - 20 - cp.getY(), 0);
+                    }
                 }
                 
                 if (inters) {
-                    if (dy < 0)
-                        cp.move(0, cmove);
-                    else
-                        cp.move(0, -cmove);
+                    if (dy < 0) {
+                        cp.move(0, 20 - (cp.getY() % 20));
+                    }
+                    else {
+                        cp.move(0, -(cp.getY() % 20));
+                    }
                     inters = false;
                 }
             }
@@ -546,7 +566,7 @@ public class MainApplet extends Applet implements Runnable {
                             clips+=3;
                             break;
                         case HEALTH:
-                            human.heal(PowerupType.HEALTH.getData());
+                            human.heal(PowerupType.HEALTH.getData() + 25*level);
                             break;
                         case DAMAGE:
                             bulletdamage += 10;
