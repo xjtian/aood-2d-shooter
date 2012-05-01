@@ -625,7 +625,7 @@ public class ScrollingMap extends Applet implements Runnable {
             frames++;
             
             if (human.getHealth() <= 0) {
-                System.out.println("You lost"); //@TODO: something prettier
+                System.out.println("You lost");
                 long time2 = System.currentTimeMillis();
                 stopFlag = false;
                 int framerate =  (int) (frames / ((time2 - time) / 1000));

@@ -378,24 +378,30 @@ public class MainApplet extends Applet implements Runnable {
             //@TODO: backwards movement logic for collision detections
             int umove = (int) (dt / 3);
             if (umove == 0) umove = (int)(Math.random() * 2);
+            Rectangle hbound;
             
             if (commands[KeyEvent.VK_A] || commands[KeyEvent.VK_LEFT]) {
                 human.move(-umove, 0);
-                if (human.getX() < 0)
+                if (human.getX() < 0) {
                     human.move(umove, 0);
+                    human.move(-human.getX(), 0);
+                }
+                hbound = human.getBounds();
                 for (Polygon p : barriers) {
-                    if (p.intersects(human.getBounds())) {
-                        human.move(umove, 0);
+                    if (p.intersects(hbound)) {
+                        human.move(10 - (human.getX() % 20), 0);
                         break;
                     }
                 }
             }
             if (commands[KeyEvent.VK_D] || commands[KeyEvent.VK_RIGHT]) {
                 human.move(umove, 0);
-                if (human.getX() > DIM - 40)
-                    human.move(-umove, 0);
+                if (human.getX() > DIM - 40) {
+                    human.move(DIM - 40 - human.getX(), 0);
+                }
+                hbound = human.getBounds();
                 for (Polygon p : barriers) {
-                    if (p.intersects(human.getBounds())) {
+                    if (p.intersects(hbound)) {
                         human.move(-umove, 0);
                         break;
                     }
