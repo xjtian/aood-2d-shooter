@@ -397,7 +397,10 @@ public class MainApplet extends Applet implements Runnable {
                 hbound = human.getBounds();
                 for (Polygon p : barriers) {
                     if (p.intersects(hbound)) {
-                        human.move(20 - (human.getX() % 20), 0);
+                        human.move(umove, 0);
+                        human.move(-1, 0);
+                        if (p.intersects(human.getBounds()))
+                            human.move(1, 0);
                         break;
                     }
                 }
@@ -410,7 +413,10 @@ public class MainApplet extends Applet implements Runnable {
                 hbound = human.getBounds();
                 for (Polygon p : barriers) {
                     if (p.intersects(hbound)) {
-                        human.move(-(human.getX() % 20), 0);
+                        human.move(-umove, 0);
+                        human.move(1, 0);
+                        if (p.intersects(human.getBounds()))
+                            human.move(-1, 0);
                         break;
                     }
                 }
@@ -423,7 +429,10 @@ public class MainApplet extends Applet implements Runnable {
                 }
                 for (Polygon p : barriers) {
                     if (p.intersects(human.getBounds())) {
-                        human.move(0, 20 - (human.getY() % 20));
+                        human.move(0, umove);
+                        human.move(0, -1);
+                        if (p.intersects(human.getBounds()))
+                            human.move(0, 1);
                         break;
                     }
                 }
@@ -434,7 +443,10 @@ public class MainApplet extends Applet implements Runnable {
                     human.move(0, DIM - 40 - human.getY());
                 for (Polygon p : barriers) {
                     if (p.intersects(human.getBounds())) {
-                        human.move(0, -(human.getY() % 20));
+                        human.move(0, -umove);
+                        human.move(0, 1);
+                        if (p.intersects(human.getBounds()))
+                            human.move(0, -1);
                         break;
                     }
                 }
