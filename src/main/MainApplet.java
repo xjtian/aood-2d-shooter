@@ -106,11 +106,11 @@ public class MainApplet extends Applet implements Runnable {
             }
             
             Rectangle boundsbig = temp.getBounds();
-            boundsbig.grow(2, 2);
+            boundsbig.grow(4, 4);
             Rectangle intboundsbig;
             for (Polygon p : barriers) {
                 intboundsbig = p.getBounds();
-                intboundsbig.grow(2, 2);
+                intboundsbig.grow(4, 4);
                 if (boundsbig.intersects(intboundsbig))
                     continue placebarriers;
             }
@@ -177,7 +177,7 @@ public class MainApplet extends Applet implements Runnable {
         }
         
         placecounter = 0;
-        placehealths: while (placecounter < level) {
+        placehealths: while (placecounter < (int)(level * 1.5)) {
             placex = (int) (Math.random() * GRID_SIZE);
             placey = (int) (Math.random() * GRID_SIZE);
             
@@ -306,6 +306,8 @@ public class MainApplet extends Applet implements Runnable {
         ogr.drawString("" + score, 3, 398);
         if (ammo <= CLIP_SIZE / 4 && clips > 0) {
             ogr.setColor(Color.gray);
+            if (ammo == 0)
+                ogr.setColor(Color.red);
             ogr.drawString("R to Reload", 150, 225);
         }
         ogr.dispose();
@@ -383,7 +385,7 @@ public class MainApplet extends Applet implements Runnable {
                 
                 cp.setDirection(cdir);
             }
-            //@TODO: check left-sided user collision with vertical L leg
+            
             int umove = (int) (dt / 3);
             if (umove == 0) umove = (int)(Math.random() * 2);
             Rectangle hbound;
@@ -461,7 +463,6 @@ public class MainApplet extends Applet implements Runnable {
             }
             
             //Start cpu movement logic
-            //@TODO: same corrections to cpu collision detection
             int dx, dy;
             boolean inters = false;
             int cmove = (int)(dt / 5);
@@ -502,10 +503,12 @@ public class MainApplet extends Applet implements Runnable {
                 }
                 
                 if (inters) {//moved into barrier
-                    if (dx < 0)
-                        cp.move(20 - (cp.getX() % 20), 0);
-                    else
-                        cp.move(-(cp.getX() % 20), 0);
+                    if (dx < 0) {
+                        cp.move(cmove, 0);
+                    }
+                    else {
+                        cp.move(-cmove, 0);
+                    }
                     inters = false;
                 }
                 //vertical movement
@@ -540,10 +543,10 @@ public class MainApplet extends Applet implements Runnable {
                 
                 if (inters) {
                     if (dy < 0) {
-                        cp.move(0, 20 - (cp.getY() % 20));
+                        cp.move(0, cmove);
                     }
                     else {
-                        cp.move(0, -(cp.getY() % 20));
+                        cp.move(0, -cmove);
                     }
                     inters = false;
                 }

@@ -24,7 +24,7 @@ public class ComputerPlayer extends Player {
     
     @Override
     public java.awt.Rectangle getBounds() {
-        return new java.awt.Rectangle(super.x, super.y, 20, 20);
+        return new java.awt.Rectangle(super.x + 2, super.y + 2, 16, 16);
     }
     
     @Override

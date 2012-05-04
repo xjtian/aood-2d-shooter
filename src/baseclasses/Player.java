@@ -72,7 +72,7 @@ public class Player {
     }
     
     public java.awt.Rectangle getBounds() {
-        return new java.awt.Rectangle(x, y, 40, 40);
+        return new java.awt.Rectangle(x+2, y+2, 36, 36);
     }
     
     public void draw(Graphics2D g) {
