@@ -86,6 +86,7 @@ public class MainApplet extends Applet implements Runnable {
     
     private void generateGame(boolean damage) {
         //instantiate map barriers
+        //@TODO: Ensure 1-square boundary around map
         barriers.clear();
         int bplace = 0;
         Polygon temp;
@@ -106,11 +107,11 @@ public class MainApplet extends Applet implements Runnable {
             }
             
             Rectangle boundsbig = temp.getBounds();
-            boundsbig.grow(4, 4);
+            boundsbig.grow(20, 20);
             Rectangle intboundsbig;
             for (Polygon p : barriers) {
                 intboundsbig = p.getBounds();
-                intboundsbig.grow(4, 4);
+                intboundsbig.grow(20, 20);
                 if (boundsbig.intersects(intboundsbig))
                     continue placebarriers;
             }
@@ -257,6 +258,7 @@ public class MainApplet extends Applet implements Runnable {
             if ((p.getX() >= camx && p.getX() <= camx+400) && (p.getY() >= camy && p.getY() <= camy+400))
                 p.drawWithShift(ogr, -camx, -camy);
         }
+        //@TODO: draw ammo and player health bars to right of enemy health bars
         int totalbars = 1 + cpuPlayers.size();  //draw health bars
         ogr.setColor(Color.green);
         ogr.fillRect(400 - 20*totalbars, 10, 10, human.getHealth() / 2);
