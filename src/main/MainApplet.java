@@ -86,16 +86,16 @@ public class MainApplet extends Applet implements Runnable {
     
     private void generateGame(boolean damage) {
         //instantiate map barriers
-        //@TODO: Ensure 1-square boundary around map
         barriers.clear();
         int bplace = 0;
         Polygon temp;
         int choice, x, y, w, h;
-        placebarriers: while (bplace < 70) {
-            x = (int)(GRID_SIZE*Math.random());
-            y = (int)(GRID_SIZE*Math.random());
+        placebarriers: while (bplace < 85 - 5*level) {
             w = (int)(9*Math.random())+1;
             h = (int)(9*Math.random())+1;
+            x = (int)((GRID_SIZE-w-2)*Math.random()) + 1;
+            y = (int)((GRID_SIZE-h-2)*Math.random()) + 1;
+            
             choice = (int)(5*Math.random());
             switch (choice) {
                 case 0: temp = BarrierFactory.generateLeftFlippedL(x, y, w, h); break;
