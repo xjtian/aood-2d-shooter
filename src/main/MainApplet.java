@@ -292,7 +292,7 @@ public class MainApplet extends Applet implements Runnable {
             xtop = (int)(xrat*75);
             ytop = (int)(yrat*75);
 
-            ogr.fillRect(xtop-1, ytop-1, 3, 3);
+            ogr.fillRect(xtop-1+3, ytop-1+3, 3, 3);
         }
         for (ComputerPlayer cp : frozenCPU) {
             xrat = (double)cp.getX() / 1200.0;
@@ -300,7 +300,7 @@ public class MainApplet extends Applet implements Runnable {
             xtop = (int)(xrat*75);
             ytop = (int)(yrat*75);
 
-            ogr.fillRect(xtop, ytop, 2, 2);
+            ogr.fillRect(xtop+3, ytop+3, 2, 2);
 
         }
         ogr.setColor(Color.yellow);
