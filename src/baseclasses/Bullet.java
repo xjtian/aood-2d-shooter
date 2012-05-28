@@ -8,7 +8,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import javax.imageio.ImageIO;
 
 /**
@@ -44,6 +43,15 @@ public class Bullet {
         }
     }
     
+    /**
+     * Creates a new bullet and a linear flight path.
+     * 
+     * @param x x-coordinate of the bullet.
+     * @param y y-coordinate of the bullet.
+     * @param mx x-coordinate of second point for slope of bullet path.
+     * @param my y-coordinate of second point for slope of bullet path.
+     * @param human true if bullet is fired by a human player.
+     */
     public Bullet(int x, int y, int mx, int my, boolean human) {
         this.x = x;
         this.y = y;
@@ -70,6 +78,11 @@ public class Bullet {
         y = (negativey) ? y - (int)dy : y + (int)dy;
     }
     
+    /**
+     * Move the bullet based on the amount of time that has passed.
+     * 
+     * @param dt time passed since last run of game loop, in milliseconds.
+     */
     public void move(long dt) {
         double t = (double)dt;
         double dx;
@@ -96,6 +109,12 @@ public class Bullet {
             g.drawImage(csprite, x, y, null);
     }
     
+    /**
+     * Draw the bullet on a shifted coordinate system.
+     * @param g Graphics context in which to draw the bullet.
+     * @param dx x-shift.
+     * @param dy y-shift.
+     */
     public void drawWithShift(Graphics g, int dx, int dy) {
         if (human)
             g.drawImage(hsprite, x + dx, y + dy, null);
@@ -129,10 +148,22 @@ public class Bullet {
         return new Point(x, y);
     }
     
+    /**
+     * Get the bounding box of the bullet.
+     * 
+     * @return A 10x10 rectangle that contains the bullet.
+     */
     public Rectangle getBounds() {
         return new Rectangle(x, y, 10, 10);
     }
     
+    /**
+     * Get the bounding box of the bullet in a shifted coordinate system.
+     * 
+     * @param offx x-shift.
+     * @param offy y-shift.
+     * @return A 10x10 rectangle that contains the bullet, shifted.
+     */
     public Rectangle getShiftedBounds(int offx, int offy) {
         return new Rectangle(x+offx, y+offy, 10, 10);
     }

@@ -11,7 +11,8 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 /**
- *
+ * Ammo powerup.
+ * 
  * @author Jacky Tian
  */
 public class ReloadPowerup extends RotatingPowerup {
@@ -20,6 +21,11 @@ public class ReloadPowerup extends RotatingPowerup {
         sprites = new HashMap<Integer, BufferedImage>();
     }
     
+    /**
+     * Creates a new ammo powerup at the specified location.
+     * @param x x-coordinate.
+     * @param y y-coordinate.
+     */
     public ReloadPowerup(int x, int y) {
         super(x, y);
         if (sprites.isEmpty())

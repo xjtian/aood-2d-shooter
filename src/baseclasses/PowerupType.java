@@ -5,12 +5,21 @@
 package baseclasses;
 
 /**
- *
+ * Enumeration of possible powerup types.
  * @author Jacky Tian
  */
 public enum PowerupType {
+    /**
+     * Ammo powerup.
+     */
     AMMO(75),
+    /**
+     * Health powerup.
+     */
     HEALTH(150),
+    /**
+     * Damage upgrade powerup.
+     */
     DAMAGE(10);
     
     private final int data;

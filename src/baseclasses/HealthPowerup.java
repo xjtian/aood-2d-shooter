@@ -11,7 +11,8 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 /**
- *
+ * Health powerup (heal).
+ * 
  * @author Jacky Tian
  */
 public class HealthPowerup extends RotatingPowerup {
@@ -20,12 +21,21 @@ public class HealthPowerup extends RotatingPowerup {
         sprites = new HashMap<Integer, BufferedImage>();
     }
     
+    /**
+     * Create a new powerup at specified position.
+     * 
+     * @param x x-coordinate of powerup.
+     * @param y y-coordinate of powerup.
+     */
     public HealthPowerup(int x, int y) {
         super(x, y);
         if (sprites.isEmpty())
             loadImages();
     }
     
+    /**
+     * Create and pre-load all images of the powerup.
+     */
     public static void loadImages() {
         if (sprites.isEmpty()) {
             BufferedImage original = new BufferedImage(20, 20, BufferedImage.BITMASK);

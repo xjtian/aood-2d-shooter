@@ -11,8 +11,9 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 /**
- *
- * @author jacky
+ * Damage upgrade powerup.
+ * 
+ * @author Jacky Tian
  */
 public class DamagePowerup extends RotatingPowerup {
     private static final HashMap<Integer, BufferedImage> sprites;
@@ -20,12 +21,21 @@ public class DamagePowerup extends RotatingPowerup {
         sprites = new HashMap<Integer, BufferedImage>();
     }
     
+    /**
+     * Creates a new powerup at specified position.
+     * 
+     * @param x x-coordinate of the powerup.
+     * @param y y-coordinate of the powerup.
+     */
     public DamagePowerup(int x, int y) {
         super(x, y);
         if (sprites.isEmpty())
             loadImages();
     }
     
+    /**
+     * Create and pre-load all images of the powerup.
+     */
     public static void loadImages() {
         if (sprites.isEmpty()) {
             BufferedImage original = new BufferedImage(20, 20, BufferedImage.BITMASK);
@@ -47,7 +57,7 @@ public class DamagePowerup extends RotatingPowerup {
         }
     }
 
-     @Override
+    @Override
     public void draw(Graphics2D g) {
         g.drawImage(sprites.get(super.getDirection()), super.getX(), super.getY(), null);
     }

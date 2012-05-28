@@ -8,13 +8,13 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 /**
- *
- * @author xtian8741
+ * A factory class for pre-loading all computer sprites.
+ * 
+ * @author Jacky Tian
  */
 public class ComputerSpriteLoader {
     private static final HashMap<Integer, BufferedImage> sprites;
@@ -25,7 +25,7 @@ public class ComputerSpriteLoader {
     public static final int HEIGHT = 40;
     
     /**
-     * Load all 24 sprites as hardware-accelerated images.
+     * Load all 24 sprites.
      */
     public static void loadAllImages() {
         int direction = 0;

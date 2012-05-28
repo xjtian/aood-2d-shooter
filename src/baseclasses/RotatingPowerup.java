@@ -5,7 +5,8 @@
 package baseclasses;
 
 /**
- *
+ * An abstract powerup that is animated by rotating in place.
+ * 
  * @author Jacky Tian
  */
 public abstract class RotatingPowerup implements Powerup {
@@ -13,6 +14,11 @@ public abstract class RotatingPowerup implements Powerup {
     private int y;
     private int direction;
     
+    /**
+     * Create a new rotating powerup at specified location.
+     * @param x x-coordinate.
+     * @param y y-coordinate.
+     */
     public RotatingPowerup(int x, int y) {
         this.x = x;
         this.y = y;
@@ -29,17 +35,11 @@ public abstract class RotatingPowerup implements Powerup {
         return direction;
     }
     
-    /**
-     * @return the x-coordinate of the powerup.
-     */
     @Override
     public int getX() {
         return x;
     }
 
-    /**
-     * @return the y-coordinate of the powerup.
-     */
     @Override
     public int getY() {
         return y;

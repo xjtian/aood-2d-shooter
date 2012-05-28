@@ -8,15 +8,11 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 /**
- * This is a class that contains every player sprite based on turn direction in degrees 
- * as a hardware-accelerated image. Before doing anything in the applet/game, call 
- * <code>loadAllImages()</code> to populate the static map of sprites so that any 
- * repainting and rendering done in the window uses GPU.
+ * A factory class for player sprites.
  * 
  * @author Jacky Tian
  */
@@ -29,7 +25,7 @@ public class PlayerSpriteLoader {
     public static final int HEIGHT = 40;
     
     /**
-     * Load all 24 sprites as hardware-accelerated images.
+     * Load all 24 sprites.
      */
     public static void loadAllImages() {
         int direction = 0;
