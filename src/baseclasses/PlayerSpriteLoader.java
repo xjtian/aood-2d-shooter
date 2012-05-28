@@ -36,8 +36,8 @@ public class PlayerSpriteLoader {
         BufferedImage loaded;
         while (direction <= 345) {
             try {
-                loaded = ImageIO.read(PlayerSpriteLoader.class.getClass().getResource("/resources/playersprites/ps" + Integer.toString(direction) + ".png"));
-            } catch (IOException ex) {
+                loaded = ImageIO.read(PlayerSpriteLoader.class.getResource("/resources/playersprites/ps" + Integer.toString(direction) + ".png"));
+            } catch (Exception ex) {
                 loaded = new BufferedImage(40, 40, BufferedImage.BITMASK);
             }
             

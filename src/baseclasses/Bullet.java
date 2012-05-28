@@ -32,14 +32,14 @@ public class Bullet {
     private static BufferedImage csprite;
     static {
         try {
-            hsprite = ImageIO.read(Bullet.class.getClass().getResource("/resources/playershot.png"));
-        } catch (IOException ex) {
+            hsprite = ImageIO.read(Bullet.class.getResource("/resources/playershot.png"));
+        } catch (Exception ex) {
             hsprite = new BufferedImage(10, 10, BufferedImage.BITMASK);
         }
         
         try {
-            csprite = ImageIO.read(Bullet.class.getClass().getResource("/resources/cpushot.png"));
-        } catch (IOException ex) {
+            csprite = ImageIO.read(Bullet.class.getResource("/resources/cpushot.png"));
+        } catch (Exception ex) {
             csprite = new BufferedImage(10, 10, BufferedImage.BITMASK);
         }
     }

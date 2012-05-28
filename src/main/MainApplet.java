@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 /**
  * Main applet.
@@ -63,6 +64,8 @@ public class MainApplet extends Applet implements Runnable {
     private static final int DIM = 1200;
     private static final int GRID_SIZE = DIM / 20;
     private static final int CLIP_SIZE = 75;
+    
+    private static final javax.swing.JComponent msgparent = new javax.swing.JComponent() {};
     
     @Override
     public void init() {
@@ -258,22 +261,22 @@ public class MainApplet extends Applet implements Runnable {
             if ((p.getX() >= camx && p.getX() <= camx+400) && (p.getY() >= camy && p.getY() <= camy+400))
                 p.drawWithShift(ogr, -camx, -camy);
         }
-        //@TODO: draw ammo and player health bars to right of enemy health bars
-        int totalbars = 1 + cpuPlayers.size();  //draw health bars
-        ogr.setColor(Color.green);
-        ogr.fillRect(400 - 20*totalbars, 10, 10, human.getHealth() / 2);
+               
+        ogr.setColor(Color.green);//draw player health
+        ogr.fillRect(380, 0, 10, human.getHealth() / 2);
         ogr.setColor(Color.yellow);
-        for (int i = 0; i < ammo; i++) {    //draw ammo bar
-            ogr.fillRect(400 - 20*totalbars - 25, 5*i, 15, 3);
+        for (int i = 0; i < ammo; i++) {    //draw ammo bars
+            ogr.fillRect(360, 5*i, 15, 3);
         }
         ogr.setColor(Color.orange);
         for (int i = 0; i < clips; i++) {
-            ogr.fillRect(400 - 20*totalbars - 40, 15*i, 10, 10);
+            ogr.fillRect(345, 15*i, 10, 10);
         }
-        ogr.setColor(Color.red);
+        ogr.setColor(Color.red);    //draw cpu health bars
         for (int i = 0; i < cpuPlayers.size(); i++) {
-            ogr.fillRect(400 - 20*(totalbars - i - 1), 10, 10, cpuPlayers.get(i).getHealth() / 2);
+            ogr.fillRect(330-20*i, 0, 10, cpuPlayers.get(i).getHealth() / 2);
         }
+        
         for (Bullet b : userbullets)    //drawing bullets
             b.drawWithShift(ogr, -camx, -camy);
         for (Bullet b : cpubullets)
@@ -340,7 +343,7 @@ public class MainApplet extends Applet implements Runnable {
         boolean pistolShot = false;
         gameloop: while(stopFlag) {
             long dt = System.currentTimeMillis() - loopController;
-            if (dt < 4)
+            if (dt < 5)
                 continue gameloop;
             loopController = System.currentTimeMillis();
             
@@ -478,7 +481,7 @@ public class MainApplet extends Applet implements Runnable {
                 dx = human.getX() - cp.getX();
                 if (dx < 0)
                     cp.move(-cmove, 0);
-                else
+                else if (dx > 0)
                     cp.move(cmove, 0);
                 //Collisions and bounds checks
                 if (cp.getX() < DIM-20 && cp.getX() > 0) {
@@ -499,7 +502,7 @@ public class MainApplet extends Applet implements Runnable {
                         cp.move(cmove, 0);
                         cp.move(-cp.getX(), 0);
                     }
-                    else {
+                    else if (dx > 0) {
                         cp.move(DIM - 20 - cp.getX(), 0);
                     }
                 }
@@ -508,7 +511,7 @@ public class MainApplet extends Applet implements Runnable {
                     if (dx < 0) {
                         cp.move(cmove, 0);
                     }
-                    else {
+                    else if (dx > 0) {
                         cp.move(-cmove, 0);
                     }
                     inters = false;
@@ -517,7 +520,7 @@ public class MainApplet extends Applet implements Runnable {
                 dy = human.getY() - cp.getY();
                 if (dy < 0)
                     cp.move(0, -cmove);
-                else
+                else if (dy > 0)
                     cp.move(0, cmove);
                 //Collisions and bounds checks
                 if (cp.getY() < DIM-20 && cp.getY() > 0) {
@@ -538,7 +541,7 @@ public class MainApplet extends Applet implements Runnable {
                         cp.move(0, cmove);
                         cp.move(0, -cp.getY());
                     }
-                    else {
+                    else if (dy > 0) {
                         cp.move(DIM - 20 - cp.getY(), 0);
                     }
                 }
@@ -547,7 +550,7 @@ public class MainApplet extends Applet implements Runnable {
                     if (dy < 0) {
                         cp.move(0, cmove);
                     }
-                    else {
+                    else if (dy > 0) {
                         cp.move(0, -cmove);
                     }
                     inters = false;
@@ -699,22 +702,20 @@ public class MainApplet extends Applet implements Runnable {
                 if ((cpx < camx || cpx > camx+400) || (cpy < camy || cpy > camy+400))
                     frozenCPU.add(cpuPlayers.remove(i));
             }
-                
-            offPaint(bdt);  //Paint!
+            
+            //----------------PAINT!!!----------------
+            offPaint(bdt);
             
             if (human.getHealth() <= 0) {
-                System.out.println("You lost"); //@TODO: something prettier
-                long time2 = System.currentTimeMillis();
-                stopFlag = false;
-                int framerate =  (int) (frames / ((time2 - time) / 1000));
-                System.out.println("Average " + framerate + "fps");
-                System.exit(0);
+                quitScreen();
+                //long time2 = System.currentTimeMillis();
+                //int framerate =  (int) (frames / ((time2 - time) / 1000));
+                //System.out.println("Average " + framerate + "fps");
             }
             
             if (cpuPlayers.isEmpty() && frozenCPU.isEmpty()) {
-                System.out.println("New level");
                 level++;
-                score += 100;
+                score += 100*level;
                 generateGame(true);
                 clickScreen();
                 time = System.currentTimeMillis();
@@ -758,8 +759,7 @@ public class MainApplet extends Applet implements Runnable {
                             newlevel = true;
                         } else if ((my > 225 && my < 250)) {
                             paused = false;
-                            stopFlag = false;
-                            System.exit(0);
+                            quitScreen();
                         } 
                     }
                     
@@ -770,9 +770,7 @@ public class MainApplet extends Applet implements Runnable {
                         newlevel = true;
                     } else if (commands[KeyEvent.VK_Q]) {
                         paused = false;
-                        stopFlag = false;
-                        System.exit(0);
-                        //@TODO: more graceful exit
+                        quitScreen();
                     }
                     
                     if (newlevel) {
@@ -794,9 +792,22 @@ public class MainApplet extends Applet implements Runnable {
         }
     }
     
+    private void restartGame() {
+        level = 1;
+        score = 0;
+        generateGame(true);
+        clickScreen();
+    }
+    
+    private void quitScreen() {
+        JOptionPane.showMessageDialog(msgparent, "You made it through " + level + 
+                " levels with a score of " + score, "Game Over", JOptionPane.PLAIN_MESSAGE);
+        restartGame();
+    }
+    
     @Override
     public void stop() {
-        long time2 = System.currentTimeMillis();
+//        long time2 = System.currentTimeMillis();
         stopFlag = false;
         paused = false;
         try {
@@ -805,13 +816,13 @@ public class MainApplet extends Applet implements Runnable {
         gameLoop = null;
         
         disableEvents(AWTEvent.KEY_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK);
-        int framerate;
-        try {
-            framerate =  (int) (frames / ((time2 - time) / 1000));
-        } catch (ArithmeticException ex) {
-            framerate = 0;
-        }
-        System.out.println("Average " + framerate + "fps");
+//        int framerate;
+//        try {
+//            framerate =  (int) (frames / ((time2 - time) / 1000));
+//        } catch (ArithmeticException ex) {
+//            framerate = 0;
+//        }
+//        System.out.println("Average " + framerate + "fps");
     }
     
     @Override
